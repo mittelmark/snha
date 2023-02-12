@@ -1,0 +1,51 @@
+---
+title: "Vignette for the package ..."
+author: Max Musterman
+date: 2023-02-05
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r echo=FALSE,results="hide"}
+library(knitr)
+```
+
+## Introduction
+
+Below you find example code for the package...
+
+```{r}
+x=1
+print(x)
+```
+
+## Plot example
+
+```{r fig=TRUE,fig.width=9,fig.height=6}
+data(iris)
+par(mfrow=c(1,2),mai=rep(0.8,4))
+plot(iris$Sepal.Width~iris$Sepal.Length,
+    col=as.numeric(iris$Species)+1,pch=15)
+plot(iris$Petal.Width~iris$Petal.Length,
+    col=as.numeric(iris$Species)+1,pch=15)
+```
+
+## Table Example
+
+```{r results="asis"}
+knitr::kable(head(iris))
+```
+
+## Inline expression
+
+The dataset iris has `r nrow(iris)` plants.
+
+## EOF
+
+
+

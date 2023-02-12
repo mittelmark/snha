@@ -1,0 +1,12 @@
+Package: Rpkg
+Type: Package
+Title: your package title change the name on top
+Version: 0.1
+Date: 2023-02-05
+Author: Max Musterman, University of Mustercity
+Maintainer: Max Musterman <musti@uni-mustercity.de>
+Description: R package for ...
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+License: MIT + file LICENSE
+NeedsCompilation: no
