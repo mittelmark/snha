@@ -1,9 +1,9 @@
 VERSION := 0.1
 PKG     := $(shell basename `pwd`)
-build:
+build: man/snha.Rd
 	R CMD build .
 
-check: build man/add.Rd
+check: build
 	R CMD check $(PKG)_$(VERSION).tar.gz
 
 man/%.Rd: R/%.R

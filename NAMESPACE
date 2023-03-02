@@ -1,1 +1,4 @@
 exportPattern("^[[:lower:]]+")
+importFrom("stats", "cor")
+importFrom("stats", "cor.test")
+
