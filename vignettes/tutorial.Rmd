@@ -1,51 +1,121 @@
 ---
-title: "Vignette for the package ..."
-author: Max Musterman
-date: 2023-02-05
-output: 
-    rmarkdown::html_vignette:
-        toc: true
-vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
+title: "Tutorial on the snha package - Network construction using the St. Nicolas House Algorithm"
+shorttitle: "snha package tutorial"
+author: Detlef Groth, University of Potsdam, Germany
+date: 2023-03-02
+abstract: >
+    The *snha* package provides an easy to use interface to apply the St. Nicolas House Algorithm which traces associations chains between interactiving variables.
+    In this package vignette the basic workflow for analyzing raw data or for analysing correlation matrices is demonstrated.
+bibliography: bibliography.bib
+csl: nature-biotechnology.csl
 
-```{r echo=FALSE,results="hide"}
-library(knitr)
-```
+documentclass: scrartcl
+geometry:
+- top=20mm
+- bottom=35mm
+- left=20mm
+- right=20mm
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{pkgname}
+  %\usepackage[utf8]{inputenc}
+---
 
 ## Introduction
 
-Below you find example code for the package...
+The package _snha_ explores interacting variables by searching association
+chains, so where correlation coefficient drop in a regular oder between the
+nodes. The package can be easily used by calling the function _snha_ with
+your data, where the columns must be your variables. The return value is an
+object of class _snha_ which has a plot function. The detailed analysis can be
+inspected by looking at the internal variables of this object. Below a minimal
+analysis for the _birthwt_ data from the _MASS_ R package. The variables are:
+
+* _age_ - mother's age in years.
+* _lwt_ - mother's weight in pounds at last menstrual period.
+* _race_ - mother's race (1 = white, 2 = black, 3 = other).
+* _smoke_ - smoking status during pregnancy (0 = no, 1 = yes).
+* _ptl_ - number of previous premature labours.
+* _ht_ - history of hypertension (0 = no, 1 = yes).
+* _ui_ - presence of uterine irritability (0 = no, 1 = yes).
+* _ftv_ -number of physician visits during the first trimester.
+* _bwt_ birth weight of child in grams.
+
+Let's start with the data preparation. For illustrative purposes we add
+a random data vector as well:
+
+```{r label=ddataprep}
+set.seed(125)
+# retrieve some data
+library(MASS)
+data(birthwt)
+birthwt$low=NULL 
+# removeed column for the low indicator says 
+# if a child has low birtwt
+rnd=round(rnorm(nrow(birthwt),mean=10,sd=2),2)
+# rnd just contains random data
+birthwt=cbind(birthwt,rnd=rnd) # adding a random var
+head(birthwt)
+```
+
+Ok, we are ready to go, we added the random data column _rnd_ and removed the
+redundant column _low_ which indicated low birth weight, for this we have no
+the _bwt_ column in the data set.
+
+Let's now first start with a PCA and then with our SNHA method where we use
+Spearman correlation which is more robust against outliers than Pearson
+correlation, we set the p-value threshold, _alpha_ to 0.1 as the algorithm id
+very resitant against the detection of spurious correlations.
+
+```{r label=plotsnha, fig.width=10,fig.height=5,fig.cap="Birth weight data variable interactions"}
+par(mfrow=c(1,2),mai=c(0.8,0.8,0.1,0.2))
+library(snha)
+# retrieve some data
+pca=prcomp(t(scale(birthwt)))
+summary(pca)
+plot(pca$x[,1:2],xlab='PC1', ylab='PC2',pch=19,cex=5,col='salmon')
+text(pca$x[,1:2],colnames(birthwt))
+as=snha(birthwt,method="spearman",alpha=0.1) 
+par(mai=c(0.8,0.2,0.1,0.2))
+plot(as,layout="sam",vertex.size=7,lwd=3,edge.width=3)
+box()
+```
+
+As you can see the variables in this simple graphs show immeadiatley logical
+interaction, the birth weight is positively associated to mothers last weight,
+and negatively to smoking, premature labours and iterine irritabilty, white
+people smoke more and white mothers visit more often physicians ... The older
+the mother the more visits at physicians and hpertension is positively
+associated with weight of the mother.
+
+What are the r-square values, prediction power for every node based on linear
+models and what are the connections:
 
 ```{r}
-x=1
-print(x)
+round(snha_rsquare(as),2)
+as$theta
 ```
 
-## Plot example
+It can be seen that the overal strength of the association is very small,
+largest r-square value is 0.18 for smoke, but still the analysis show reasonable
+results without having the necessity of finding the right threshold.
 
-```{r fig=TRUE,fig.width=9,fig.height=6}
-data(iris)
-par(mfrow=c(1,2),mai=rep(0.8,4))
-plot(iris$Sepal.Width~iris$Sepal.Length,
-    col=as.numeric(iris$Species)+1,pch=15)
-plot(iris$Petal.Width~iris$Petal.Length,
-    col=as.numeric(iris$Species)+1,pch=15)
+
+## Decathlon data
+
+Here is an other example where we analyze the relationship between the different
+decathlon elements with athlets taking part in the 1988 olympics and which were
+above 7000 points. We perform the St. Nicolas House Algorithm analysis and
+later check the average R-square values for the each node.
+
+```{r label=dec,fig.width9,fig.height=6,fig.cap="Decathlon Data 1988"}
+data(decathlon88)
+head(decathlon88)
+A=snha(decathlon88,method="spearman",alpha=0.1)
+cols=rep("salmon",10)
+cols[names(A$data) %in% c("jave","shot","disc","pole")]="skyblue"
+plot(A,layout="sam",vertex.color=cols,vertex.size=8,cex=1.1,edge.width=5)
+asg_rsquare(A)
+mn=mean(asg_rsquare(A))
+title(paste("R-square = ",round(mn,2)))
 ```
-
-## Table Example
-
-```{r results="asis"}
-knitr::kable(head(iris))
-```
-
-## Inline expression
-
-The dataset iris has `r nrow(iris)` plants.
-
-## EOF
-
-
-
