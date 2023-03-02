@@ -2,6 +2,7 @@
 *.tar.gz
 *~
 *.swp
+*.swo
 *Rcheck*
 .Rhistory
 .RData
