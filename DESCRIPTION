@@ -1,12 +1,12 @@
-Package: Rpkg
+Package: snha
 Type: Package
-Title: your package title change the name on top
+Title: St. Nicolas House Algorithm for R
 Version: 0.1
-Date: 2023-02-05
-Author: Max Musterman, University of Mustercity
-Maintainer: Max Musterman <musti@uni-mustercity.de>
-Description: R package for ...
-Suggests: knitr, rmarkdown
+Date: 2023-02-13
+Author: Detlef Groth, University of Potsdam, Germany
+Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
+Description: R package for creating correlation networks using the St. Nicolas House Algorithm.
+Suggests: knitr, rmarkdown, MASS
 VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no
