@@ -340,7 +340,7 @@ snha_rsquare = function (data,g=NULL) {
 #' }
 #'
 
-snha_graph2data <- function (g,n=100,iter=15,val=100,sd=2,prop=0.05,noise=1,method="mc") {
+snha_graph2data <- function (g,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,method="mc") {
     A=g
     res=matrix(0,ncol=n,nrow=nrow(A))
     rownames(res)=rownames(A)
@@ -352,6 +352,7 @@ snha_graph2data <- function (g,n=100,iter=15,val=100,sd=2,prop=0.05,noise=1,meth
     for (i in 1:n) {
         units=rnorm(nrow(A),mean=val,sd=sd)
         names(units)=rownames(A)
+        nms=names(units)
         for (j in 1:iter) {
             for (node in sample(rownames(A))) {
                 targets=colnames(A)[which(A[node,]!=0)]
@@ -361,15 +362,22 @@ snha_graph2data <- function (g,n=100,iter=15,val=100,sd=2,prop=0.05,noise=1,meth
                     nval=nval+units[[target]]*(1-(prop*P))
                     if (A[node,target]<0) {
                         diff=nval-units[[target]]
-                        nval=units[[target]]-diff
+                        nval=units[[target]]-diff/0.5
                     }
                     units[[target]]=nval;
                 }
             }
+            # scale back to mean 100 and sd of 2
+            # units[]=scale(units)*sd+val
+            #names(units)=nms
             units=units+rnorm(length(units),sd=noise)
         }
         res[,i]=units
     }
+    rt=t(res)
+    rt=scale(rt)*sd+val
+    res=t(rt)
+    rownames(res)=nms
     return(res)
 }
 
