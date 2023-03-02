@@ -32,11 +32,11 @@ Included are all athlets which finished and have more than 7000 points.
 \examples{
 data(decathlon88)
 head(decathlon88)
-A=asg.new(decathlon88,method="spearman",alpha=0.1)
+A=snha(decathlon88,method="spearman",alpha=0.1)
 cols=rep("salmon",10)
 cols[names(A$data) \%in\% c("jave","shot","disc","pole")]="skyblue"
 plot(A,layout="sam",vertex.color=cols,vertex.size=8,cex=1.2,edge.width=5)
-asg.rsquare(A)
+snha_rsquare(A)
 
 }
 \keyword{datasets}

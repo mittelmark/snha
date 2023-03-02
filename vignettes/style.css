@@ -1,0 +1,43 @@
+/*@import url('https://fonts.googleapis.com/css2?family=Noto+Serif&display=swap');*/
+body {
+    font-family: "Noto Serif", serif;
+    width:80%;
+    margin-left:auto;
+    margin-right:auto;
+}
+h1, h4.author, h4.date {
+    text-align: center;
+}
+div#TOC {
+    background: #eeeeee;
+    padding: 20px;
+}
+
+div#TOC ul {
+ list-style-type: square;   
+}
+pre {
+    background: #eeeeee;
+    font-size: 90%;
+    padding: 10px;
+    border-top: 2px;
+    border-bottom: 2px;
+}
+pre.sourceCode {
+    background: #eeeeee;
+}
+p.caption {
+    font-weight: bold;
+    text-align: center;
+}
+div.figure {
+    align: center;
+    padding: 20px;
+/*    background: #eeeeee;
+    border: 2px solid #6666aa;*/
+}
+div.figure > img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
