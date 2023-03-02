@@ -1,0 +1,35 @@
+\name{snha_graph2data} 
+\alias{snha_graph2data} 
+\title{create correlated data for the given adjacency matrix representing 
+a directed graph or an undirected graph} 
+\description{This function is a short implementation of the Monte Carlo 
+algorithm described in Novine et. al. 2022.} 
+\arguments{ 
+\item{g}{an adjacency matrix} 
+\item{n}{number of values, measurements per node, default: 100} 
+\item{iter}{number of iterations, default: 50} 
+\item{sd}{initial standard deviation, default: 2} 
+\item{val}{initial node value, default: 100} 
+\item{prop}{proportion of the target node value take from the source node, 
+default: 0.025} 
+\item{noise}{sd for the noise value added after each iteration using rnorm 
+function with mean 0, default: 1} 
+\item{method}{method for data generation, either 'mc' for using Monte Carlo 
+simulation or 'pc' for using a precision matrix, default: 'mc'} 
+} 
+\value{matrix with the nodenames as rows and samplings in the columns} 
+\examples{ 
+par(mfrow=c(1,2),mai=rep(0.2,4)) 
+A=matrix(0,nrow=6,ncol=6) 
+rownames(A)=colnames(A)=LETTERS[1:6] 
+A[1:2,3]=1 
+A[3,4]=1 
+A[4,5:6]=1 
+A[5,6]=1 
+plot.snha(A,layout="circle");  
+data=snha_graph2data(A) 
+round(cor(t(data)),2) 
+P=snha(t(data)) 
+plot(P,layout="circle") 
+} 
+ 

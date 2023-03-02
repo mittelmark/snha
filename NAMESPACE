@@ -1,4 +1,9 @@
 exportPattern("^[[:lower:]]+")
-importFrom("stats", "cor")
-importFrom("stats", "cor.test")
+S3method(as.list,snha)
+S3method(plot,snha)
+importFrom("stats", "cor", "cor.test","as.dist","dist","rnorm","cmdscale",
+  'lm','reformulate')
+importFrom("graphics", "arrows", "axTicks", "lines", "locator",
+   "points","text")
+importFrom("MASS","sammon")
 

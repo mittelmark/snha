@@ -6,7 +6,12 @@ Date: 2023-02-13
 Author: Detlef Groth, University of Potsdam, Germany
 Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
 Description: R package for creating correlation networks using the St. Nicolas House Algorithm.
-Suggests: knitr, rmarkdown, MASS
+Imports: MASS
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no
+Collate:
+    ll.R
+    asgp.R
+    snha.R

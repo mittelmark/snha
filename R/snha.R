@@ -16,11 +16,10 @@
 #' }
 #' Utility functions:
 #' \describe{
-#' \item{\link[snha:snha.getChains]{snha.getChains(snhagraph)}}{returns the chains found by the algorithm as matrix}
-#' \item{\link[snha:snha.layout]{snha.layout(g)}}{calculate layout coordinates for the given graph or adjacency matrix}
-#' \item{\link[snha:snha.ll]{snha.ll(g,chain)}}{calculate log-likelihood for the given chain of the snha graph}
-#' \item{\link[snha:snha.mplot]{snha.mplot(mt)}}{plots an adjacency matrix using the plotting facilities of the snha package}
-#' \item{\link[snha:snha.rsquare]{snha.rsquare(data,g)}}{for given data and graph or adjacency matrix calculate 
+#' \item{\link[snha:snha_get_chains]{snha_get_chains(snhagraph)}}{returns the chains found by the algorithm as matrix}
+#' \item{\link[snha:snha_layout]{snha_layout(g)}}{calculate layout coordinates for the given graph or adjacency matrix}
+#' \item{\link[snha:snha_ll]{snha_ll(g,chain)}}{calculate log-likelihood for the given chain of the snha graph}
+#' \item{\link[snha:snha_rsquare]{snha_rsquare(data,g)}}{for given data and graph or adjacency matrix calculate 
 #'    linear model r-square value}
 #' }
 #' }
@@ -164,6 +163,255 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
     class(as)='snha'
     return(as)
 }
+
+#' \name{snha_get_chains}
+#' \alias{snha_get_chains}
+#' \title{Return the chains of an snha graph as data frame}
+#' \usage{snha_get_chains(graph)}
+#' \description{This is a utiltiy function to return the chains which
+#' constructs the graph as a matrix.}
+#' \arguments{
+#' \item{graph}{a snha graph object}
+#' }
+#' \value{matrix with one chain per row, shorter chains are filled up with
+#' empty strings}
+#' \examples{
+#' data(swiss)
+#' sw.g=snha(swiss)
+#' snha_get_chains(sw.g)
+#' }
+#' 
+
+snha_get_chains <- function (graph) {
+    mx=max(as.numeric(lapply(graph$chains,length)))
+    l=length(as.numeric(lapply(graph$chains,length)))
+    mt=matrix("",nrow=l,ncol=mx+1)
+    colnames(mt)=c("Name",paste("Node",1:mx,sep=""))
+    for (n in 1:length(names(graph$chains))) {
+        name=names(graph$chains)[n]
+        mt[n,1]=name
+        for (m in 1:length(graph$chains[[name]])) {
+            mt[n,m+1]=graph$chains[[name]][m]
+        }
+    }
+    return(mt)
+}
+
+
+#' \name{snha_ll}
+#' \alias{snha_ll}
+#' \title{log-likelihood for the given snha graph and the given chain}
+#' \description{This function returns the log-likelihood for the given snha
+#' graph and the given chain.}
+#' \arguments{
+#' \item{g}{a snha graph object}
+#' \item{chain}{a chain object of a snha graph, if not given a data frame with
+#' the values is returned for all chains, default: NULL}
+#' }
+#' \value{list with the following components: 'll.total', 'll.chain',
+#' 'll.rest', 'll.block', data frame 'df' with the columns 'chisq', 'p.value',
+#' 'block.df', 'block.ch', 'block.p.value'. If chain is not given an overal
+#' summary is made for all chains an returned as data frame.}
+#' \examples{
+#' data(swiss)
+#' sw.g=snha(swiss)
+#' snha_ll(sw.g,sw.g$chain$Catholic)
+#' head(snha_ll(sw.g))
+#' }
+#'
+
+snha_ll = function (g,chain=NULL) {
+    if (is.null(chain)) {
+        return(LL.makeDF(g$data, g$chains))
+    } else {
+        return(LL.getChainLL(g$data,chain))
+    }
+}
+#
+
+#' \name{snha_rsquare}
+#' \alias{snha_rsquare}
+#' \title{linear model r-square values for given data and graph}
+#' \description{ The function `snha_.rsquare` calculates for given data and 
+#' a graph the covered r-squared values by  a linear model for each node. 
+#' The linear model predicts each node by an additive mode 
+#' using it's neighbor nodes in the graph.}
+#' \arguments{
+#' \item{data}{snha graph object or data matrix or data frame where variables
+#' are in columns and samples in rows}
+#' \item{g}{ graph object or adjacency matrix of an (un)directed graph, not
+#' needed if data is an snha graph, default: NULL.}
+#' }
+#' \value{vector of rsquare values for each node of the graph}
+#' \examples{ 
+#' # random data
+#' A=matrix(rbinom(100,1, 0.2),nrow=10,ncol=10)
+#' diag(A)=0
+#' colnames(A)=rownames(A)=LETTERS[1:10]
+#' data=matrix(rnorm(1000),ncol=10)
+#' colnames(data)=colnames(A)
+#' snha_rsquare(data,A)
+#' # real data
+#' data(swiss)
+#' sw.s=snha(swiss,method='spearman')
+#' rsqs=snha_rsquare(sw.s)
+#' plot(sw.s,main=paste("r =",round(mean(rsqs,2))),
+#'    layout='star',star.center='Examination')
+#' # some colors for r-square values
+#' vcols=paste("grey",seq(80,40,by=-10),sep="")
+#' scols=as.character(cut(snha_rsquare(swiss,sw.s$theta),
+#'    breaks=c(0,0.1,0.3,0.5,0.7,1),labels=vcols))
+#' plot(sw.s,main=paste("r =",round(mean(snha_rsquare(swiss,sw.s$theta)),2)),
+#'    vertex.color=scols ,layout='star',star.center='Examination',
+#'    vertex.size=10,edge.color=c('black','red'),edge.width=3)
+#' }
+#'
+
+snha_rsquare = function (data,g=NULL) {
+    if (any(class(data) %in% "matrix")) {
+        data=as.data.frame(data)
+    }
+    if (class(data)[1]=="snha") {
+        g=data$theta
+        data=data$data
+    }
+    if (class(g)[1]=="snha") {
+        A=g$theta
+    } else {
+        A=g
+    }
+    if (class(g)[1] == "NULL") {
+        stop("Error: An adjacency matrix g was not given to snha_rsquare!")
+    }
+    res=c()
+    colnames(A)=rownames(A)=gsub("^([0-9])","XYZ\\1",colnames(A))
+    colnames(data)=gsub("^([0-9])","XYZ\\1",colnames(data))
+    rn=rownames(A)
+    for (i in 1:nrow(A)) {
+        nms=names(which(A[i,]==1))
+        if (length(nms) == 0) {
+            res=c(res,0)
+            next
+        }
+         frmla = reformulate(termlabels = nms,  response = rn[i])
+         modelLm = lm(frmla, data = data)
+         rsquared = summary(modelLm)$r.squared
+         res=c(res,rsquared)
+     }
+     names(res)=rn
+     names(res)=gsub("^XYZ([0-9])","\\1",names(res))
+     return(res)
+}
+
+
+#' \name{snha_graph2data}
+#' \alias{snha_graph2data}
+#' \title{create correlated data for the given adjacency matrix representing
+#' a directed graph or an undirected graph}
+#' \description{This function is a short implementation of the Monte Carlo
+#' algorithm described in Novine et. al. 2022.}
+#' \arguments{
+#' \item{g}{an adjacency matrix}
+#' \item{n}{number of values, measurements per node, default: 100}
+#' \item{iter}{number of iterations, default: 50}
+#' \item{sd}{initial standard deviation, default: 2}
+#' \item{val}{initial node value, default: 100}
+#' \item{prop}{proportion of the target node value take from the source node,
+#' default: 0.025}
+#' \item{noise}{sd for the noise value added after each iteration using rnorm
+#' function with mean 0, default: 1}
+#' \item{method}{method for data generation, either 'mc' for using Monte Carlo
+#' simulation or 'pc' for using a precision matrix, default: 'mc'}
+#' }
+#' \value{matrix with the nodenames as rows and samplings in the columns}
+#'\examples{
+#' par(mfrow=c(1,2),mai=rep(0.2,4))
+#' A=matrix(0,nrow=6,ncol=6)
+#' rownames(A)=colnames(A)=LETTERS[1:6]
+#' A[1:2,3]=1
+#' A[3,4]=1
+#' A[4,5:6]=1
+#' A[5,6]=1
+#' plot.snha(A,layout="circle"); 
+#' data=snha_graph2data(A)
+#' round(cor(t(data)),2)
+#' P=snha(t(data))
+#' plot(P,layout="circle")
+#' }
+#'
+
+snha_graph2data <- function (g,n=100,iter=15,val=100,sd=2,prop=0.05,noise=1,method="mc") {
+    A=g
+    res=matrix(0,ncol=n,nrow=nrow(A))
+    rownames(res)=rownames(A)
+    stopifnot(method %in% c('mc','pm'))
+    if (method == "pm") {
+        data=Snha_pmatrix(g,mu=val,n=n)
+        return(data)
+    }
+    for (i in 1:n) {
+        units=rnorm(nrow(A),mean=val,sd=sd)
+        names(units)=rownames(A)
+        for (j in 1:iter) {
+            for (node in sample(rownames(A))) {
+                targets=colnames(A)[which(A[node,]!=0)]
+                for (target in sample(targets)) {
+                    P=abs(A[node,target])
+                    nval=units[[node]]*(prop*P)
+                    nval=nval+units[[target]]*(1-(prop*P))
+                    if (A[node,target]<0) {
+                        diff=nval-units[[target]]
+                        nval=units[[target]]-diff
+                    }
+                    units[[target]]=nval;
+                }
+            }
+            units=units+rnorm(length(units),sd=noise)
+        }
+        res[,i]=units
+    }
+    return(res)
+}
+
+# x = adjacency matrix, factor strength
+Snha_pmatrix <- function (x,factor=1,mu=100,n=100) {
+    Adj2cov = function (x,factor=1) {
+        x[x!=0]=x[x!=0]+factor
+        diag(x)=apply(x,1,sum)+factor
+        return(x)
+    }
+    Cov2data = function (x,mu=rep(0,nrow(x)),n=100) {
+        data=MASS::mvrnorm(n,mu=mu,Sigma=x)
+        colnames(data)=colnames(x)
+        return(data)
+    }
+    
+    Pcor2cor = function (x, tol = sqrt(.Machine$double.eps)) {
+        x = -x
+        rn=rownames(x)
+        diag(x) = -diag(x)
+        x = MASS::ginv(x, tol = tol)
+        rownames(x)=colnames(x)=rn
+        return(stats::cov2cor(x))
+    }
+    y=Snha_d2u(x)
+    COV=Adj2cov(y,factor=factor)
+    COR=Pcor2cor(COV)
+    data=Cov2data(COR,mu=rep(mu,nrow(x)),n=n)
+    return(t(data))
+}
+
+# private functions
+
+
+Snha_d2u <- function (g) {
+    g[lower.tri(g)]=g[lower.tri(g)]+t(g)[lower.tri(g)]
+    g[upper.tri(g)]=g[upper.tri(g)]+t(g)[upper.tri(g)]    
+    g[g>0]=1
+    g[g<0]=-1
+    return(g)
+}
+
 ReduceChains = function (g) {
     ichains=c()
     chs=sort(names(g$chains))
@@ -211,3 +459,658 @@ ReduceChains = function (g) {
     return(g)
 }
 
+
+# methods for a snha graph
+
+#' \name{plot.snha}
+#' \alias{plot.snha}
+#' \title{display network orcorrelation matrices of snha graphs}
+#' \description{The function `plot.snha` provides a simple display of network graphs correlation matrices using 
+#' filled circles (vertices) to represent variables and edges which connect the vertices with high absolute. 
+#' correlation values. Positive correlations are shown in black, negative
+#' correlations are shown in red. For more information see the details
+#' section.}
+#' \details{This is a small plot utility to display networks or correlation matrices of snha graph objects. 
+#'          In case of boostrapping the graph by using the `snha` function with the `prob=TRUE` 
+#'          option full, broken and dotted lines are drawn per default if the
+#'          are found in more than 75, 50 or 25 percent of all resamplings. You
+#'          can change this by using the `threshold` argument.}
+#' \usage{
+#' \method{plot}{snha}(
+#'  x,
+#'  type = "network",
+#'  layout = "circle",
+#'  vertex.color = "salmon",
+#'  cex = 1,
+#'  vertex.size = 5,
+#'  edge.width = 2,
+#'  edge.color = c("grey70", "red"),
+#'  edge.text = NULL,
+#'  edge.cex = 0.8,
+#'  edge.pch = 0,
+#'  noise = FALSE,
+#'  hilight.chain = NULL,
+#'  chain.color = c("black", "red"),
+#'  star.center = NULL,
+#'  plot.labels = TRUE,
+#'  lty = 1,
+#'  threshold = c(0.25, 0.5, 0.75),
+#'  interactive = FALSE,
+#'  ...
+#' )
+#' }
+#' \arguments{
+#' \item{x}{snha graph object usually results of the snha function or an
+#' adjacency matrix}
+#' \item{type}{character string specifying the plot type either 'network' or
+#' 'cor', default: 'network'}
+#' \item{layout}{graph layout for plotting one of 'circle', 'sam', 'samd',
+#' 'grid', 'mds', 'mdsd', 'star', default: 'circle'}
+#' \item{vertex.color}{default color for the vertices, either a single value,
+#' all vertices have hen this color or a vector of values, for different colors
+#' for the nodes, default: 'salmon'}
+#' \item{cex}{size of the vertex labels which are plotted on the vertices,
+#' default: 1}
+#' \item{vertex.size}{number how large the vertices should be plotted, default:
+#' 5}
+#' \item{edge.width}{number on how strong the edges should be plotted, if
+#' edge.width=0, then the number is based on the correlation values, default:
+#' 2}
+#' \item{edge.color}{color to be plotted for edges. Usually vector of length
+#' two. First color for positive correlations, second color for negative
+#' corrleations. Default: c('grey','red')}
+#' \item{edge.text}{optional matrix to give edge labels, default: NULL}
+#' \item{edge.cex}{character expansion for edge labels, default: 0.8}
+#' \item{edge.pch}{plotting character which should be placed below the
+#' edge.text, default: 0}
+#' \item{noise}{should be noise added to the layout. Sometimes useful if nodes
+#' are too close. Default: FALSE}
+#' \item{hilight.chain}{which chain should be highlighted, default: NULL (no
+#' chain highlight)}
+#' \item{chain.color}{which color for chain edges, default: black}
+#' \item{star.center}{the centered node if layout is 'start', must be
+#' a character string for the nodename, default: NULL}
+#' \item{plot.labels}{should node labels plotted, default: TRUE}
+#' \item{lty}{line type for standard edges in the graph, default: 1}
+#' \item{threshold}{cutoff values for bootstrap probabilities for drawing edges
+#' as dotted. broken lines and solid lines, default: c(0.25,0.5,0.75)}
+#' \item{interactive}{switch into interactive mode where you can click in the
+#' graph and move nodes with two clicks, first selecting the node, second click
+#' gives thehe new coordinates for the node, default: FALSE}
+#' \item{\dots}{curently not used}
+#' }
+#' \value{returns the layout of the plotted network or NULL if type is corplot
+#' (invisible)}
+#' \examples{ 
+#' data(swiss)
+#' sw.g=snha(swiss,method='spearman')
+#' sw.g$theta
+#' round(sw.g$sigma,2)
+#' plot(sw.g,type='network',layout='circle')
+#' plot(sw.g,type='network',layout='sam')
+#' plot(sw.g,type='corplot')
+#' # adding correlation values
+#' plot(sw.g,edge.text=round(sw.g$sigma,2),edge.cex=1.2,edge.pch=15)
+#' sw.g=snha(swiss,method='spearman',prob=TRUE)
+#' sw.g$theta
+#' sw.g$probabilities
+#' plot(sw.g,type='network',layout='sam')
+#' sw.g$chains
+#' # plot chains for a node
+#' plot(sw.g,layout="sam",lty=2,hilight.chain="Infant.Mortality",
+#'  edge.width=3,edge.color=c("black","red"))
+#' # an example for an adjacency matrix
+#' M=matrix(rbinom(100,1, 0.2),nrow=10,ncol=10)
+#' diag(M)=0
+#' colnames(M)=rownames(M)=LETTERS[1:10]
+#' plot.snha(M)
+#' }
+#'
+
+plot.snha = function (x,type='network',
+                     layout='circle',
+                     vertex.color='salmon',cex=1,
+                     vertex.size=5,edge.width=2,
+                     edge.color=c('grey70','red'),edge.text=NULL,edge.cex=0.8,edge.pch=0,
+                     noise=FALSE, 
+                     hilight.chain=NULL,
+                     chain.color=c('black','red'),
+                     star.center=NULL,
+                     plot.labels=TRUE,
+                     lty=1,threshold=c(0.25,0.5,0.75),
+                     interactive=FALSE,...) {
+    g=x
+    if (any(class(g) %in% "matrix")) {
+        g=as.data.frame(g)
+    }
+    marrow <- function(x0, y0, x1, y1, cut.front, cut.back, col='black', ...){
+        x0.new <- (1 - cut.front) * x0 + cut.front * x1
+        y0.new <- (1 - cut.front) * y0 + cut.front * y1
+        x1.new <- (1 - cut.back) * x1 + cut.back * x0
+        y1.new <- (1 - cut.back) * y1 + cut.back * y0
+        arrows(x0.new, y0.new, x1.new, y1.new, col=col, ...)
+    }
+    getPCols = function (n) {
+        if(n > 20 |  n < 1) {
+            stop("only between 1 and 20 colors can be given" ) 
+        }
+        pcols= c("#FFC5D0","#FDC8C3","#F6CBB7","#EDD0AE","#E2D4A8","#D4D8A7","#C5DCAB","#B6DFB4","#A8E1BF",
+                 "#9EE2CB", "#99E2D8","#9BE0E5","#A4DDEF","#B3D9F7","#C4D5FB","#D5D0FC","#E4CBF9","#F0C7F2",
+                 "#F9C5E9", "#FEC4DD")
+                 idx=seq(1,20,by=floor(20/n))
+                 return(pcols[idx])
+    }
+
+    if (type %in% c('corrplot','cor','corplot')) {
+        Snha_corrplot(g$sigma,text.lower=TRUE,cex=cex,...)
+        lay=NULL
+    } else {
+        if (any(class(layout) %in% "character")) {
+            if (class(g)[1]=="snha") {
+                xy=snha_layout(g,mode=layout,noise=noise,star.center=star.center,method=g$method)    
+            } else {
+                xy=snha_layout(g,mode=layout,noise=noise,star.center=star.center)    
+            }
+        } else if (any(class(layout) %in% 'matrix')) {
+            xy=layout
+            colnames(xy)=c("x","y")
+            if (is.null(rownames(xy)[1])) {
+                rownames(xy)=rownames(g)
+            }
+        }
+        arrow <- function (x,y,cut=0.6,lwd=2,lty=1,arrow.col="#666666",...) {
+            hx <- (1 - cut) * x[1] + cut * x[2]
+            hy <- (1 - cut) * y[1] + cut * y[2]
+            arrows(hx,hy,x[2],y[2],lwd=lwd,code=0,col=arrow.col,lty=lty,...)
+            for (a in c(20,15,10,5)) {
+                arrows(x[1],y[1],hx,hy,length=0.06*lwd,angle=a,lwd=lwd,col=arrow.col,lty=lty,...)
+            }
+        }
+
+        doPlot = function (theta,sigma,xy,node=NULL,probabilities=NULL,cmatrix=NULL,...) {
+            xrange=range(xy[,1])
+            yrange=range(xy[,2])
+            xlim=c(xrange[1]-1/10*diff(xrange),xrange[2]+1/10*diff(xrange))
+            ylim=c(yrange[1]-1/10*diff(yrange),yrange[2]+1/10*diff(yrange))
+            if (class(probabilities)[1] == "NULL") {
+                probabilities=theta
+            }
+            plot(xy,pch=19,col="salmon",cex=vertex.size,axes=FALSE,xlab="",ylab="",
+                 xlim=xlim,ylim=ylim,...)
+            directed=!identical(theta,t(theta))
+            for (i in 1:(nrow(theta))) {
+                for (j in 1:nrow(theta)) {
+                    if (i == j) { next }
+                    x1=xy[rownames(theta)[i],1]
+                    x2=xy[rownames(theta)[j],1]
+                    y1=xy[rownames(theta)[i],2]
+                    y2=xy[rownames(theta)[j],2]
+                    if (edge.width==0) {
+                        ew=as.numeric(cut(abs(sigma[i,j]),breaks=c(0,0.1,0.3,0.5,1)))
+                    } else {
+                        ew=edge.width
+                    }
+                    if (abs(probabilities[i,j])>threshold[3]) {
+                        lty=1
+                    } else if (abs(probabilities[i,j])>threshold[2]) {
+                        lty=2
+                    } else if (abs(probabilities[i,j])>threshold[1]) {
+                        lty=3
+                    } else {
+                        lty=0
+                    }
+                    if (sigma[i,j]>0) {
+                        col=chain.color[1]
+                        col.edge=edge.color[1]
+                    } else {
+                        col=chain.color[2]
+                        col.edge=edge.color[2]
+                    }
+                    if (theta[i,j] != 0 | theta [j,i] !=0 ) {
+                        if (!is.null(hilight.chain) && cmatrix[i,j] > 0) {
+                            lines(c(x1,x2),c(y1,y2),lwd=ew,col=col,lty=1)
+                        } else {
+                            if (directed) {
+                                arrow(c(x1,x2),c(y1,y2),lwd=ew,arrow.col=col.edge,lty=lty)
+                            } else {
+                                lines(c(x1,x2),c(y1,y2),lwd=ew,col=col.edge,lty=lty)
+                            }
+                        }
+                        if (is.matrix(edge.text) & lty > 0) {
+                            hx <- 0.5 * x1 + 0.5 * x2
+                            hy <- 0.5 * y1 + 0.5 * y2
+                            if (edge.pch>0) {
+                                points(hx,hy,pch=edge.pch,cex=5*edge.cex,col="#cccccc")
+                            }
+                            jitx=0;# jitter(diff(range(axTicks(1)))/30,amount=0.1)
+                            jity=0; jitter(diff(range(axTicks(2)))/30,amount=0.1)
+                            text(hx+jitx,hy+jity,edge.text[i,j],cex=edge.cex,col=col)
+                        }
+
+                    }
+                }
+            }
+            points(xy,pch=19,col="black",cex=vertex.size+0.3)
+            points(xy,pch=19,col=vertex.color,cex=vertex.size)
+            if (plot.labels) {
+                text(xy,rownames(theta),cex=cex)
+            }
+            return(xy)
+        }
+        lay=xy
+        if (class(g)[1] =="snha") {
+            if (class(hilight.chain)[1] != "NULL") {
+                cmatrix=g$sigma
+                cmatrix[]=0
+                chns=grep(hilight.chain,names(g$chains))
+                for (nm in names(g$chain)[chns]) {
+                    for (i in 1:(length(g$chain[[nm]])-1)) {
+                        x=g$chain[[nm]][i]
+                        y=g$chain[[nm]][i+1]
+                        cmatrix[x,y]=1
+                        cmatrix[y,x]=1
+                    }
+                }
+                #print(cmatrix)
+            }
+            if (interactive) {
+                print("click two times, first on the point to move, second where to move\nEnd with one or two right clicks!")
+                while (TRUE) {
+                    loc=locator(2)
+                    if (class(loc) == "NULL" | class(loc$x[2]) == "NULL" | class(loc$x[1]) == "NULL") {
+                        break
+                    }
+                    dlay=rbind(lay,c(loc$x[1],loc$y[1]))
+                    d=as.matrix(dist(dlay))[nrow(dlay),1:(nrow(dlay)-1)]
+                    nm=names(which(d==min(d)))[1]
+                    lay[nm,1]=loc$x[2]
+                    lay[nm,2]=loc$y[2]
+                    lay=doPlot(g$theta,g$sigma,lay,probabilities=g$probabilities,cmatrix=cmatrix,...)
+                }
+            }
+            doPlot(g$theta,g$sigma,lay,probabilities=g$probabilities,cmatrix=cmatrix,...)
+        } else {
+            if (interactive) {
+                lay=doPlot(g,g,xy,probabilities=g,...)
+                print("click two times, first on the point to move, second where to move\nEnd with one or two right clicks!")
+                while (TRUE) {
+                    loc=locator(2)
+                    if (class(loc) == "NULL" | class(loc$x[2]) == "NULL" | class(loc$x[1]) == "NULL") {
+                        break
+                    }
+                    dlay=rbind(lay,c(loc$x[1],loc$y[1]))
+                    d=as.matrix(dist(dlay))[nrow(dlay),1:(nrow(dlay)-1)]
+                    nm=names(which(d==min(d)))[1]
+                    lay[nm,1]=loc$x[2]
+                    lay[nm,2]=loc$y[2]
+                    lay=doPlot(g,g,xy,probabilities=g,...)
+                }
+            }
+                    
+            # just an adjacency matrix
+            doPlot(g,g,lay,probabilities=g,...)
+        }
+    }
+    invisible(lay)
+}
+
+
+#' \name{as.list.snha}
+#' \alias{as.list.snha}
+#' \title{return a list representation for an snha graph object}
+#' \description{`as.list.snha` provides a S3 method to convert an snha graph object
+#'              into a list object which can be for instance used to write a report
+#'               using the library openxlsx.}
+#' \arguments{
+#' \item{x}{ a snha graph object created with the snha function}
+#' \item{\ldots}{ additional arguments, delegated to the list command}
+#' }
+#' \value{list object with the components 'theta', 'sigma', 'p.value'}
+#' \examples{ 
+#' data(swiss)
+#' as=snha(swiss,method="spearman",alpha=0.1)
+#' result=as.list(as)
+#' ls(result)
+#' result$settings
+#' # can be writte as xlsx file for instance like:
+#' # library(openxlsx)
+#' # write.xlsx(result,file="some-result.xlsx")
+#' }
+#' \seealso{\link[snha:plot.snha]{plot.snha}}
+#'
+
+
+as.list.snha = function (x,...) {
+    df=as.data.frame(unlist(lapply(x$chains,paste,collapse=", ")))
+    colnames(df)[1]="chain"
+    return(
+           list(data=x$data,theta=x$theta,
+                sigma=x$sigma,p.value=x$p.value,
+                chains=df,
+                settings=data.frame(info=c("method","alpha","threshold"),
+                                    values=c(x$method,x$alpha,x$threshold)),...)
+           )
+}
+
+#' \name{snha_layout}
+#' \alias{snha_layout}
+#' \title{Determine graph layouts.}
+#' \description{ This function returns xy coordinates for a given input adjacency matrix or snha graph. 
+#' This function is useful if you like to plot the same set of nodes with different edge connections 
+#' in the same layout.}
+#' \arguments{
+#' \item{A}{an adjacency matrix or an snha graph object}
+#' \item{mode}{character string for the layout type, can be either 'mds' (mds
+#' on graph), 'mdsd' (mds on data) 'sam' (sammon on graph), 'samd' (sammon on
+#' data), 'circle', 'grid' or 'star', default: 'sam'}
+#' \item{method}{method for calculating correlation distance if mode is either
+#' 'mdsd' or 'samd', default: 'pearson'}
+#' \item{noise}{should some noise be added, default: FALSE}
+#' \item{star.center}{the centered node if layout is 'star', must be
+#' a character string for the nodename, default: NULL}
+#' \item{interactive}{switch into interactive mode where you can click in the
+#' graph and move nodes with two clicks, first selecting the node, second click
+#' gives the new coordinates for the node, default: FALSE}
+#' }
+#' \keyword{network, layout}
+#' \value{matrix with x and y columns for the layout}
+#' \examples{
+#' data(swiss)
+#' sw.s=snha(swiss,method='spearman')
+#' sw.p=snha(swiss,method='pearson')
+#' lay=snha_layout(sw.s,mode='sam')
+#' plot(sw.s,layout=lay)
+#' plot(sw.p,layout=lay)
+#' plot(sw.s,layout='star',star.center='Education')
+#' rn1=rnorm(nrow(swiss))
+#' nswiss=cbind(swiss,Rn1=rn1)
+#' plot(snha(nswiss,method='spearman'),layout='sam')
+#' plot(snha(nswiss,method='spearman'),layout='samd',
+#'   vertex.size=2,vertex.color='beige')
+#' }
+
+snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center=NULL,interactive=FALSE) {
+    if (mode %in% c('samd','mdsd')) {
+        if(class(A)[1] == "snha") {
+            A=as.matrix(A$sigma)
+        }
+    }
+    if(class(A)[1] =="snha") {
+        S=A$sigma
+        A=as.matrix(A$theta)
+        idx=which(apply(A,1,sum)==0)
+        if (length(idx)>0) {
+            diag(S)=0
+            for (i in idx) {
+                j=which(abs(S[i,])==max(abs(S[i,])))
+                A[i,j]=1
+                A[j,i]=1
+            }
+        }
+    }
+    if (mode %in% c('mds','sam')) {
+        A=ConnectComponents(A)
+        sp=Snha_shortest_paths(A)
+        xy=cmdscale(sp)
+        rownames(xy)=rownames(A)
+        if (mode=='mds') {
+            dxy=base::as.matrix(dist(xy))
+            diag(dxy)=1
+            idx=which(dxy<0.05,arr.ind=TRUE)
+            if (nrow(idx)>1) {
+                for (i in 1:nrow(idx)) {
+                    # add noise to nodes on the same point
+                    #print(i)
+                    n=idx[i,1]
+                    xy[n,1]=xy[n,1]+rnorm(1,mean=0,sd=0.1)
+                    xy[n,2]=xy[n,2]+rnorm(1,mean=0,sd=0.1)
+                }
+            }
+            return(xy)
+        } else {
+            xy=xy+jitter(xy)
+            #xy=mcg.sam(sp)
+            xy=MASS::sammon(sp,y=xy,trace=FALSE)$points
+            # add some jitter
+            #sp[]=sp+rnorm(nrow(projection)*2,sd=sd(projection)*0.1)
+            #projection[]=
+            #xy = MASS::sammon(sp)$points        
+        }
+    } else if (mode == "samd") {
+        xy=MASS::sammon(as.dist(1-cor(A,method=method,use='pairwise.complete.obs')^2))$points
+    } else if (mode == "mdsd") {
+        xy=cmdscale(as.dist(1-cor(A,method=method,use='pairwise.complete.obs')^2))
+        rownames(xy)=colnames(A)
+    } else if (mode == 'circle') {
+        x=0
+        y=0
+        a=0.5
+        b=0.5
+        rad2deg <- function(rad) {(rad * 180) / (pi)}
+        deg2rad <- function(deg) {(deg * pi) / (180)}
+        nodes=rownames(A)
+        xy=matrix(0,ncol=2,nrow=length(nodes))
+        rownames(xy)=nodes
+        for (i in 1:length(nodes)) {
+            t=deg2rad((360/length(nodes))*(i-1))
+            xp = a*cos(t)*0.75 + x;
+            yp = b*sin(t)*0.75 + y;
+            xy[nodes[i],]=c(xp,yp)
+        }
+    } else if (mode == 'star') {
+        oorder=rownames(A)
+        if (class(star.center)[1] != "NULL") {
+            norder=c(which(rownames(A)==star.center),which(rownames(A)!=star.center))
+            A=A[norder,norder]
+        }
+        x=0
+        y=0
+        a=0.5
+        b=0.5
+        rad2deg <- function(rad) {(rad * 180) / (pi)}
+        deg2rad <- function(deg) {(deg * pi) / (180)}
+        nodes=rownames(A)
+        xy=matrix(0,ncol=2,nrow=length(nodes))
+        rownames(xy)=nodes
+        xy[1,]=c(0.0,0.0)
+        for (i in 2:length(nodes)) {
+            t=deg2rad((360/(length(nodes)-1))*(i-2))
+            xp = a*cos(t)*0.75 + x;
+            yp = b*sin(t)*0.75 + y;
+            xy[nodes[i],]=c(xp,yp)
+        }
+        xy=xy[oorder,]
+    } else if (mode == 'grid') {
+        n=nrow(A)
+        xy=matrix(0,ncol=2,nrow=nrow(A))
+        rownames(xy)=rownames(A)
+        mody=ceiling(sqrt(n))
+        x=0
+        y=0
+        for (r in rownames(A)) {
+            if (x %% mody == 0) {
+                y=y+1
+                x=0
+            }
+            x=x+1
+            xy[r,]=c(x,y)
+        }
+    } else {
+        stop("unknown layout. Use mds, circle, or grid as layout")
+    }
+    xy=scale(xy)
+    if (noise) {
+        xy=xy+rnorm(length(xy),mean=0,sd=0.1)
+    }
+    colnames(xy)=c("x","y")
+    if (interactive) {
+        plot.snha(A,layout=xy)
+        print("click two times, first on the point to move, second where to move\nEnd with one or two right clicks!")
+        lay=xy
+        while (TRUE) {
+            loc=locator(2)
+            if (class(loc) == "NULL" | class(loc$x[2]) == "NULL" | class(loc$x[1]) == "NULL") {
+                break
+            }
+            dlay=rbind(lay,c(loc$x[1],loc$y[1]))
+            d=as.matrix(dist(dlay))[nrow(dlay),1:(nrow(dlay)-1)]
+            nm=names(which(d==min(d)))[1]
+            lay[nm,1]=loc$x[2]
+            lay[nm,2]=loc$y[2]
+            lay=plot.snha(A,layout=lay)
+        }
+        xy=lay
+        return(xy)
+    } else {
+        return(xy)
+    }
+}
+## Private functions
+##
+Components = function (A) {
+    A=as.matrix(A)
+    A=A+t(A)
+    A[A>0]=1
+    comp=c()
+    P=Snha_shortest_paths(A)
+    nodes=rownames(A)
+    x=1
+    while (length(nodes) > 0) {
+        n=nodes[1]
+        idx=which(P[n,] < Inf)
+        ncomp=rep(x,length(idx))
+        names(ncomp)=rownames(P)[idx]
+        comp=c(comp,ncomp)
+        nodes=setdiff(nodes,rownames(P)[idx])
+        x=x+1
+    }
+    return(comp[rownames(A)])
+}
+
+ConnectComponents = function (A) {
+    A=as.matrix(A)
+    A=A+t(A)
+    A[A>0]=1
+    P=Snha_shortest_paths(A)
+    if (!any(P==Inf)) {
+        return(A)
+    }
+    comp=Components(A)
+    nodes=c()
+    tab=table(comp)
+    for (n in names(tab)) {
+        c=names(which(comp==n))
+        if (tab[[n]] > 2) {
+            Am=A[c,c]
+            # todo min
+            deg=apply(Am,1,sum)
+            idx=which(deg>0)
+            minval=min(deg[idx])
+            idx=which(deg == minval)[1]
+            node=c[idx]
+        } else {
+            node = c[1]
+        }
+        nodes=c(nodes,node)
+    }
+    A[nodes,nodes]=1
+    diag(A)=0
+    return(A)
+}
+
+Snha_shortest_paths = function (A,mode="directed") {
+    if (class(A)[1] == "snha") {
+        A=A$theta
+    }
+    if (mode == "undirected") {
+        A=A+t(A)
+        A[A!=0]=1
+    }
+    S=A
+    S[]=Inf
+    diag(S)=0
+    x=1
+    S[A > 0 & A < Inf]=1
+    while (TRUE) { 
+        flag = FALSE 
+        for (m in 1:nrow(S)) {
+            ns=which(S[m,] == x)
+            for (n in ns) {
+                for (o in which(A[n,]==1)) {
+                    if (o != m) {
+                        flag = TRUE
+                        if (S[m,o] > x + 1) {
+                            S[m,o]=x+1
+                            if (mode == "undirected") {
+                                S[o,m]=x+1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (!flag) {
+            break
+        }
+        x=x+1
+    }
+    return(S)
+}
+
+Snha_corrplot = function (mt,text.lower=FALSE,text.upper=FALSE,pch.minus=19,pch.plus=19,xtext=NULL,cex=1.0,...) {
+    plot(1,type="n",xlab="",ylab="",axes=FALSE,
+         xlim=c(-0.5,ncol(mt)+0.5),ylim=c(nrow(mt)+0.5,0),...)
+    cscale=cex
+    cex=0.9*(10/nrow(mt))
+    if (cex>0.9) {
+        cex=1
+    }
+    cex=cscale*cex
+    # change
+    text(1:ncol(mt),0.25,colnames(mt),cex=cex)
+    if (length(xtext)>0) {
+        text(1:ncol(mt),nrow(mt)+0.75,xtext,cex=cex)
+    }
+    # change
+    text(0,1:nrow(mt),rownames(mt),cex=cex)
+    cols=paste("#DD3333",rev(c(15,30, 45, 60, 75, 90, "AA","BB","CC","DD")),sep="")
+    cols=c(cols,paste("#3333DD",c(15,30, 45, 60, 75, 90, "AA","BB","CC","DD"),sep=""))
+    breaks=seq(-1,1,by=0.1)                  
+    sym=identical(rownames(mt),colnames(mt))
+    cex=5*(10/nrow(mt))
+    if (cex>5) {
+        cex=5
+    }
+    cex=cscale*cex
+    for (i in 1:nrow(mt)) {
+        for (j in 1:nrow(mt)) {
+            if (sym & i == j) {
+                next
+            }   
+            #cex=abs(mt[i,j])*2
+            coli=cut(mt[i,j],breaks=breaks,labels=1:20)
+            pch=19
+            if (is.na(mt[i,j])) {
+                pch=NA
+            } else if (mt[i,j]< 0) {
+                pch=pch.minus
+            } else {
+                pch=pch.plus
+            }
+            if (i == j & !sym & text.lower) {
+                text(i,j,sprintf("%.2f",mt[i,j]),cex=(cex/5.5))
+            } else if (i < j & text.lower) {
+                text(i,j,round(mt[i,j],2),cex=(cex/5.5))
+            } else if (i > j & text.upper) {
+                text(i,j,round(mt[i,j],2),cex=(cex/5.5))
+            } else {
+                if (pch==17) {
+                    points(i,j,pch=pch,cex=cex*0.7*cscale,col=cols[coli])
+                } else {
+                    points(i,j,pch=pch,cex=cex*0.8*cscale,col=cols[coli])
+                }
+            }
+
+        }
+    }
+}

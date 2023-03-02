@@ -16,11 +16,10 @@ S3 methods for snha graphs:
 } 
 Utility functions: 
 \describe{ 
-\item{\link[snha:snha.getChains]{snha.getChains(snhagraph)}}{returns the chains found by the algorithm as matrix} 
-\item{\link[snha:snha.layout]{snha.layout(g)}}{calculate layout coordinates for the given graph or adjacency matrix} 
-\item{\link[snha:snha.ll]{snha.ll(g,chain)}}{calculate log-likelihood for the given chain of the snha graph} 
-\item{\link[snha:snha.mplot]{snha.mplot(mt)}}{plots an adjacency matrix using the plotting facilities of the snha package} 
-\item{\link[snha:snha.rsquare]{snha.rsquare(data,g)}}{for given data and graph or adjacency matrix calculate  
+\item{\link[snha:snha_get_chains]{snha_get_chains(snhagraph)}}{returns the chains found by the algorithm as matrix} 
+\item{\link[snha:snha_layout]{snha_layout(g)}}{calculate layout coordinates for the given graph or adjacency matrix} 
+\item{\link[snha:snha_ll]{snha_ll(g,chain)}}{calculate log-likelihood for the given chain of the snha graph} 
+\item{\link[snha:snha_rsquare]{snha_rsquare(data,g)}}{for given data and graph or adjacency matrix calculate  
    linear model r-square value} 
 } 
 } 
