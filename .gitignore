@@ -1,6 +1,7 @@
 ..Rcheck
 *.tar.gz
 *~
+*.swp
 *Rcheck*
 .Rhistory
 .RData
