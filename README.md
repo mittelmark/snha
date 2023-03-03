@@ -1,89 +1,85 @@
-# Rpkg
+# Snha package
 
-A generic R package template.
+R package which implements the St. Nicolas House Algorithm (SNHA) for
+constructing networks of correlated variables using a ranking of the pairwise
+correlation values. The package contains the R code for the papers:
 
-Just use the green "Use this template" link on top to create your own R-package in Github.
+- Groth, D., Scheffler, C., & Hermanussen, M. (2019). Body height in stunted
+  Indonesian children depends directly on parental education and not via
+  a nutrition mediated pathway-Evidence from tracing association chains by St.
+  Nicolas House Analysis. Anthropologischer Anzeiger, 76(5), 445-451. 
+  [https://doi.org/10.1127/anthranz/2019/1027](https://doi.org/10.1127/anthranz/2019/1027)
+- Hermanussen, M., Aßmann, C., & Groth, D. (2021). Chain Reversion for Detecting 
+  Associations in Interacting Variables—St. Nicolas House Analysis. 
+  International journal of environmental research and public health, 18(4), 1741
+  [https://doi.org/10.3390/ijerph18041741](https://doi.org/10.3390/ijerph18041741)
 
-You need to edit thereafter at least two files where your place the right
-package name and change the other relevant information like author, license
-etc.
-
-* DESCRIPTION
-* tests/test-add.R
-
-If you do not want to create a package vignette just remove the entry in the
-description file with the vignette information, so the lines starting with
-`Suggests:` and `VignetteBuilder:`. Your package has then zero dependencies from other R packages.
-
-
-## Build and Install test
-
-To build, check and install this package you need only an installed R. If you
-create your repository you have to change the relevant parts entering, package
-name, author etc in the description file and the library call in the file
-tests/test-add.R. Then you can start a first check if the package is
-installable.
-
-
-The commands are the following:
+## Installation
 
 ```
-R CMD build .                   # creates a tar.gz file
-R CMD check pkgname_0.1.tar.gz  # replace pkgname with your name
+library(remotes)
+remotes::install_github("https://github.com/mittelmark/snha")
 ```
 
-## Documenting your code
-
-If this is all ok, you can start entering your own code and update your documentation and tests. The template provides as well a simple R script which copies the documentation out of the R-files into the man-directory. If you do not like this approach of combining the documentation with the code in one file you can as well just skip this file and create directly your own Rd-files. The documentation out of the R files is extracted like this:
+Thereafter you can check the installation like this:
 
 ```
-Rscript bin/rman.R R/add.R
+library(snha)
+citation("snha")
 ```
 
-This approach, embedding the documentation in the R file and then extracting
-it into the man-folder is very similar to that of the documentation tool
-[roxygen2](https://cran.r-project.org/web/packages/roxygen2/index.html), but
-here you do not need the roxygen2 package with all the dependencies, just this simple extraction script
-`bin/rman.R`. 
-
-## Makefile
-
-There is as well a Makefile file which provides the necessary commands to
-build and install the package and which does as well a check if the R file is
-newer than the Rd file and only then does the required update. If you use make
-you can then simple write:
+Which should display something like this:
 
 ```
-make check VERSION=0.1
+> citation("snha")
+To cite package 'snha' in publications use:
+
+> citation("snha")
+
+To cite package ‘snha’ in publications use:
+
+  Detlef Groth, University of Potsdam (2023). snha: St.
+  Nicolas House Algorithm for R. R package version 0.1.
+
+...
 ```
 
-if your version number is 0.1.
+## Example
 
-If you do not use make just execute the required commands manually in the terminal.
+The package has a function `snha` where you give your data as input. The
+function then results than an object of class `snha` which you can plot and
+explore easily. Here an example just using the `swiss` data which are part of
+every R installation:
 
+```r
+> library(MASS)
+> data(swiss)
+> colnames(swiss)=abbreviate(swiss)
+> as=snha(swiss,method="spearman")
+> plot(as)
+> plot(as,layout="sam",vertex.size=8)
+> ls(as)
+[1] "alpha"         "chains"        "data"          "method"
+[5] "p.values"      "probabilities" "sigma"         "theta"
+[9] "threshold"
+> as$theta
+     Frtl Agrc Exmn Edct Cthl In.M
+Frtl    0    0    1    0    0    1
+Agrc    0    0    0    1    0    0
+Exmn    1    0    0    1    1    0
+Edct    0    1    1    0    0    0
+Cthl    0    0    1    0    0    0
+In.M    1    0    0    0    0    0
+
+> head(swiss)
 ```
-Rscript bin/rman.R R/add.R
-R CMD build .
-R CMD check pkgname_version.tar.gz
-R CMD INSTALL pkgname_version.tar.gz
-```
 
-## Files
+![](img/swiss-spearman.png)
 
-The following files are included in this package template and will be required for the package installation:
-
-* `DESCRIPTION` - the file containing the essential information about your package
-* `NAMESPACE` - the file containing the export statements, usually all functions with lower case methods are exported
-* `LICENSE` - license files can be replaced if you prefere other licenses, such as GPL or BSD
-* `R/add.R` - example R code file with embedded documentation
-* `man/add.Rd` - example R documentation file 
-
-The following files are usually not part of your package:
-
-* `Makefile` - a file for make containing essential commands to build and check the package, should be not part of the installed package, but might be helpful during development
-* `bin/rman.R` - simple R script to extract documentation from the R files, can be used for your own package instead of using roxygen2 documentation, if you edit the files in the `man` folder directly you do not need this file
-* `README.md` - this Readme your are reading, should be not part of your package, replace it wiht your own Readme file
-
+The theta object contains the adjacency matrix with the edges for the found
+graph. For more details consult the package vignette:
+`vignette(package="snha","tutorial")` or the manual package of the package
+`?snha` or `?'snha-package'`.
 
 ## Author and Copyright
 
