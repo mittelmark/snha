@@ -15,7 +15,7 @@ correlation values. The package contains the R code for the papers:
   [https://doi.org/10.3390/ijerph18041741](https://doi.org/10.3390/ijerph18041741)
 
 For an implementation of the algorithm in Python look here
-[https://github.com/thake/snha4py](https://github.com/thake/snha4py).
+[https://github.com/thake93/snha4py](https://github.com/thake93/snha4py).
 
 ## Installation
 
