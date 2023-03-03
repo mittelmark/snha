@@ -89,4 +89,4 @@ License: MIT License see the file [LICENSE](LICENSE) for details.
 
 ## Bug reporting
 
-In case of bugs and suggestions, use the [https://github.com/mittelmark/Rpkg/issues](issues) link on top.
+In case of bugs and suggestions, use the [https://github.com/mittelmark/snha/issues](issues) link on top.
