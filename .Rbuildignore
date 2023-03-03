@@ -2,3 +2,4 @@
 ^\.\.Rcheck$
 ^\.Rbuildignore~$
 ^Makefile$
+\.swo$

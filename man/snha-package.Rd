@@ -17,6 +17,8 @@ S3 methods for snha graphs:
 Utility functions: 
 \describe{ 
 \item{\link[snha:snha_get_chains]{snha_get_chains(snhagraph)}}{returns the chains found by the algorithm as matrix} 
+\item{\link[snha:snha_graph2data]{snha_graph2data(A)}}{create for the given 
+adjacency matrix some data with the appropiate correlations} 
 \item{\link[snha:snha_layout]{snha_layout(g)}}{calculate layout coordinates for the given graph or adjacency matrix} 
 \item{\link[snha:snha_ll]{snha_ll(g,chain)}}{calculate log-likelihood for the given chain of the snha graph} 
 \item{\link[snha:snha_rsquare]{snha_rsquare(data,g)}}{for given data and graph or adjacency matrix calculate  

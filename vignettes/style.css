@@ -1,7 +1,7 @@
 /*@import url('https://fonts.googleapis.com/css2?family=Noto+Serif&display=swap');*/
 body {
     font-family: "Noto Serif", serif;
-    width:80%;
+    max-width: 1000px;
     margin-left:auto;
     margin-right:auto;
 }
@@ -40,4 +40,28 @@ div.figure > img {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+td, th {
+   padding: 10px;
+}
+
+table { 
+    border-spacing: 10px;
+    border-collapse: collapse;
+    border-top: 2px solid;
+    border-bottom: 2px solid;
+    min-width: 300px;
+}
+table tr:nth-child(odd) td{
+    background: #ffffff;
+}   
+/*table tr:nth-child(even) td{
+    background: #cceeee;
+}*/
+ table tr td:first-child {
+    font-weight:bold;
+}   
+thead {
+    border-bottom: 2px solid;
 }
