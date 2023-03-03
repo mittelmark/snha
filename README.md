@@ -74,7 +74,6 @@ Edct    0    1    1    0    0    0
 Cthl    0    0    1    0    0    0
 In.M    1    0    0    0    0    0
 
-> head(swiss)
 ```
 
 ![](img/swiss-spearman.png)
