@@ -1,11 +1,12 @@
 Package: snha
 Type: Package
 Title: St. Nicolas House Analysis for R
-Version: 0.1
+Version: 0.1.0
 Date: 2023-02-13
 Author: Detlef Groth
 Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
-Description: R package for creating correlation networks using the St. Nicolas House Analysis.
+Description: R package for creating correlation networks using St. Nicolas House Analysis. See Hermanussen et.al 2021, <doi:110.3390/ijerph18041741>.
+BugReports: https://github.com/mittelmark/snha
 Depends: R (>= 3.5.0)
 Imports: MASS
 Suggests: knitr, rmarkdown
