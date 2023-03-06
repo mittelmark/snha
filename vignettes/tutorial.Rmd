@@ -2,7 +2,7 @@
 title: "Tutorial on the snha package"
 shorttitle: "snha package tutorial"
 author: Detlef Groth, University of Potsdam, Germany
-date: 2023-03-02
+date: 2023-03-05
 abstract: >
     The *snha* package provides an easy to use interface to apply the St.
     Nicolas House Algorithm which traces associations chains between
@@ -168,7 +168,82 @@ knitr::kable(df)
 As you can see, both with the original data and as well with the log-normalized
 data the Shapiro-Wilk test has a few significant entries, so we reject the
 Null-hypothesis that these data are coming from a normal distribution. So for
-our example using the `swiss` data we should very likely prefer using the Spearman correlation. 
+our example using the `swiss` data we should very likely prefer using the
+Spearman correlation. 
+
+## Plotting
+
+The plotting of the graph can be changed in various ways, for details see
+`?plot.snha`. Here I just give a few examples. As the graph is generated based
+on the underlying pairwise correlations, it might be useful to display the
+pairwise correlation either in a correlation plot or by adding the correlations
+values on the edges of the graph here an example where we do first
+a correlation plot and then a plot of the graph overlaying the edges with these
+values.
+
+```{r label=corrplot,fig.width=10,fig.height=5,fig.cap="Correlation and Network plot with correlation values"}
+par(mfrow=c(1,2),mai=rep(0.2,4))
+sw=snha(swiss,method="spearman",alpha=0.1)
+plot(sw,type="corrplot")
+plot(as,edge.text=round(as$sigma,2),edge.pch=15,layout='sam')
+```
+
+## Log-Likelihood
+
+The edge quality can be judged either by the log-likelihood ratio for the
+individual chains or by bootstrapping where we look how often a certain chain
+was found.
+
+Let's first  calculate the log-likelihoods for the different chains which were
+found. We can see the underlying chains either directly using the internal
+object chains or by using the `snha_get_chains` method which returns a data
+frame:
+
+```{r label=chains}
+snha_get_chains(as)
+```  
+
+The log-likelihood for these chains can be calculated using the function
+`snha_ll` like this:
+
+```{r label=ll}
+snha_ll(as)
+```
+
+The relevant p-values are in the last column, if the p-value is higher than
+0.05 we can assume that the chain is sufficient to capture the dependency
+between the variables of the chain. Here for the chain 2 and 3 this is the
+case, whereas for the first chain the p-value is very low indicating that the
+chain is not sufficient to capture the variable dependencies. One reason might
+be that we used Spearman correlation to create the graph whereas log-likelihood assumes linear dependencies.
+
+## Bootstrapping
+
+Another approach to evaluate the quality of chains and edges is bootstrapping.
+We sample several times items from the data set with replacement and we redo
+thereafter the analysis with each of the samples. Edges which appear only very
+rarely are less likely to be of importance.
+
+Let's use an example:
+
+```{r label=boot,fig.width=9,fig.height=4,fig.cap="Boostrap Example"}
+par(mfrow=c(1,2),mai=c(0.1,0.1,0.7,0.1))
+as.boot=snha(swiss,method="spearman",prob=TRUE)
+lay=snha_layout(as.boot,method="sam")
+plot(as,layout=lay,vertex.size=6,main="Single Run")
+plot(as.boot,layout=lay,vertex.size=6,main="Bootstrap Run")
+```
+
+Solid lines shown in the graph above indicate that edges where found in more
+than 75 percent of all re-samplings, broken lines indicate edges appearing in
+more than 50% of all re-samplings and dotted lines in 25-50% of all
+re-samplings. 
+
+As you can see the bootstrap method does find a few more edges than the single
+run variation of the `snha` method. If you network is not too large it is
+usually recommended to use bootstrapping to get more insights into the edge
+quality and to get as well edges if the network is more dense and has a lot of
+highly connected nodes.
 
 ## Creating your own data
 
@@ -235,7 +310,6 @@ Thereafter you can check the installation like this:
 library(snha)
 citation("snha")
 ```
-
 
 ## Concept
 

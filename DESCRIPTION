@@ -5,8 +5,7 @@ Version: 0.1
 Date: 2023-02-13
 Author: Detlef Groth
 Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
-Description: R package for creating correlation networks using the St. Nicolas
-House Analysis.
+Description: R package for creating correlation networks using the St. Nicolas House Analysis.
 Depends: R (>= 3.5.0)
 Imports: MASS
 Suggests: knitr, rmarkdown
