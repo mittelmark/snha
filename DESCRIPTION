@@ -11,8 +11,10 @@ Imports: MASS
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 License: MIT + file LICENSE
+Encoding: UTF-8
 NeedsCompilation: no
 Collate:
     ll.R
     asgp.R
+    priv.R
     snha.R
