@@ -2,7 +2,7 @@
 \alias{snha_get_chains} 
 \title{Return the chains of an snha graph as data frame} 
 \usage{snha_get_chains(graph)} 
-\description{This is a utiltiy function to return the chains which 
+\description{This is a utility function to return the chains which 
 constructs the graph as a matrix.} 
 \arguments{ 
 \item{graph}{a snha graph object} 

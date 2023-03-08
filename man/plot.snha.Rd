@@ -1,15 +1,18 @@
 \name{plot.snha} 
+ 
 \alias{plot.snha} 
-\title{display network orcorrelation matrices of snha graphs} 
-\description{The function `plot.snha` provides a simple display of network graphs correlation matrices using  
-filled circles (vertices) to represent variables and edges which connect the vertices with high absolute.  
-correlation values. Positive correlations are shown in black, negative 
-correlations are shown in red. For more information see the details 
-section.} 
-\details{This is a small plot utility to display networks or correlation matrices of snha graph objects.  
-         In case of boostrapping the graph by using the `snha` function with the `prob=TRUE`  
+\title{display network or correlation matrices of snha graphs} 
+\description{The function `plot.snha` provides a simple display of network  
+  graphs correlation matrices using  filled circles (vertices) to represent 
+  variables and edges which connect the vertices with high absolute.  
+  correlation values. Positive correlations are shown in black, negative 
+  correlations are shown in red. For more information see the details 
+  section. 
+} 
+\details{This is a plot function to display networks or correlation matrices of snha graph objects.  
+         In case of bootstrapping the graph by using the `snha` function with the `prob=TRUE`  
          option full, broken and dotted lines are drawn per default if the 
-         are found in more than 75, 50 or 25 percent of all resamplings. You 
+         are found in more than 75, 50 or 25 percent of all re-samplings. You 
          can change this by using the `threshold` argument.} 
 \usage{ 
 \method{plot}{snha}( 
@@ -37,46 +40,44 @@ section.}
 } 
 \arguments{ 
 \item{x}{snha graph object usually results of the snha function or an 
-adjacency matrix} 
+         adjacency matrix} 
 \item{type}{character string specifying the plot type either 'network' or 
-'cor', default: 'network'} 
+'         cor', default: 'network'} 
 \item{layout}{graph layout for plotting one of 'circle', 'sam', 'samd', 
-'grid', 'mds', 'mdsd', 'star', default: 'circle'} 
+          'grid', 'mds', 'mdsd', 'star', default: 'circle'} 
 \item{vertex.color}{default color for the vertices, either a single value, 
-all vertices have hen this color or a vector of values, for different colors 
-for the nodes, default: 'salmon'} 
-\item{cex}{size of the vertex labels which are plotted on the vertices, 
-default: 1} 
-\item{vertex.size}{number how large the vertices should be plotted, default: 
-5} 
+           all vertices have hen this color or a vector of values, 
+           for different colors for the nodes, default: 'salmon'} 
+\item{cex}{size of the vertex labels which are plotted on the vertices, default: 1} 
+\item{vertex.size}{number how large the vertices should be plotted, default: 5} 
 \item{edge.width}{number on how strong the edges should be plotted, if 
-edge.width=0, then the number is based on the correlation values, default: 
-2} 
-\item{edge.color}{color to be plotted for edges. Usually vector of length 
-two. First color for positive correlations, second color for negative 
-corrleations. Default: c('grey','red')} 
+          edge.width=0, then the number is based on the correlation values,  
+          default: 2} 
+\item{edge.color}{color to be plotted for edges. Usually vector of length two. 
+          First color for positive correlations, second color for negative 
+          correlations. Default: c('grey','red')} 
 \item{edge.text}{optional matrix to give edge labels, default: NULL} 
 \item{edge.cex}{character expansion for edge labels, default: 0.8} 
-\item{edge.pch}{plotting character which should be placed below the 
-edge.text, default: 0} 
+\item{edge.pch}{plotting character which should be placed below the edge.text, 
+           default: 0} 
 \item{noise}{should be noise added to the layout. Sometimes useful if nodes 
-are too close. Default: FALSE} 
-\item{hilight.chain}{which chain should be highlighted, default: NULL (no 
-chain highlight)} 
+           are too close. Default: FALSE} 
+\item{hilight.chain}{which chain should be highlighted,  
+           default: NULL (no chain highlight)} 
 \item{chain.color}{which color for chain edges, default: black} 
 \item{star.center}{the centered node if layout is 'start', must be 
-a character string for the nodename, default: NULL} 
+           a character string for the node name, default: NULL} 
 \item{plot.labels}{should node labels plotted, default: TRUE} 
 \item{lty}{line type for standard edges in the graph, default: 1} 
 \item{threshold}{cutoff values for bootstrap probabilities for drawing edges 
-as dotted. broken lines and solid lines, default: c(0.25,0.5,0.75)} 
+         as dotted, broken lines and solid lines, default: c(0.25,0.5,0.75)} 
 \item{interactive}{switch into interactive mode where you can click in the 
-graph and move nodes with two clicks, first selecting the node, second click 
-gives thehe new coordinates for the node, default: FALSE} 
-\item{\dots}{curently not used} 
+         graph and move nodes with two clicks, first selecting the node, 
+         second click gives the new coordinates for the node, default: FALSE} 
+\item{\dots}{currently not used} 
 } 
-\value{returns the layout of the plotted network or NULL if type is corplot 
-(invisible)} 
+\value{returns the layout of the plotted network or NULL if type is `corrplot` 
+        (invisible)} 
 \examples{  
 data(swiss) 
 sw.g=snha(swiss,method='spearman') 

@@ -1,22 +1,32 @@
 \name{snha_layout} 
+ 
 \alias{snha_layout} 
-\title{Determine graph layouts.} 
-\description{ This function returns xy coordinates for a given input adjacency matrix or snha graph.  
-This function is useful if you like to plot the same set of nodes with different edge connections  
-in the same layout.} 
+\title{Determine graph layouts} 
+\usage{snha_layout(A, 
+   mode='sam', 
+   method='pearson',  
+   noise=FALSE,  
+   star.center=NULL, 
+   interactive=FALSE) 
+} 
+\description{This function returns xy coordinates for a given input 
+      adjacency matrix or snha graph. It is useful if you like to plot 
+      the same set of nodes with different edge connections  
+      in the same layout.} 
 \arguments{ 
 \item{A}{an adjacency matrix or an snha graph object} 
-\item{mode}{character string for the layout type, can be either 'mds' (mds 
-on graph), 'mdsd' (mds on data) 'sam' (sammon on graph), 'samd' (sammon on 
-data), 'circle', 'grid' or 'star', default: 'sam'} 
+\item{mode}{character string for the layout type, can be either  
+     'mds' (mds on graph using shortest paths), 'mdsd' (mds on data) 
+     'sam' (sammon on graph), 'samd' (sammon on data), 
+     'circle', 'grid' or 'star', default: 'sam'} 
 \item{method}{method for calculating correlation distance if mode is either 
-'mdsd' or 'samd', default: 'pearson'} 
+      'mdsd' or 'samd', default: 'pearson'} 
 \item{noise}{should some noise be added, default: FALSE} 
 \item{star.center}{the centered node if layout is 'star', must be 
-a character string for the nodename, default: NULL} 
+          a character string for the node name, default: NULL} 
 \item{interactive}{switch into interactive mode where you can click in the 
-graph and move nodes with two clicks, first selecting the node, second click 
-gives the new coordinates for the node, default: FALSE} 
+       graph and move nodes with two clicks, first selecting the node, second click 
+       gives the new coordinates for the node, default: FALSE} 
 } 
 \keyword{network, layout} 
 \value{matrix with x and y columns for the layout} 

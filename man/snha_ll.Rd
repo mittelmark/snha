@@ -10,7 +10,7 @@ the values is returned for all chains, default: NULL}
 } 
 \value{list with the following components: 'll.total', 'll.chain', 
 'll.rest', 'll.block', data frame 'df' with the columns 'chisq', 'p.value', 
-'block.df', 'block.ch', 'block.p.value'. If chain is not given an overal 
+'block.df', 'block.ch', 'block.p.value'. If chain is not given an overall 
 summary is made for all chains an returned as data frame.} 
 \examples{ 
 data(swiss) 

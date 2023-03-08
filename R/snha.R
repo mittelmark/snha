@@ -2,11 +2,12 @@
 #' \alias{snha-package}
 #' \title{ snha package - association chain graphs from correlation networks}
 #' \description{ The snha package can be used to construct association chain graphs 
-#'    based on the St. Nicolas House algorithm as described in Groth et. 2019.}
+#'    based on the St. Nicolas House algorithm as described in Groth et. al. 2019.}
 #' \details{The package provides the following functions:
 #' Function for graph generation from data:
 #' \describe{
-#' \item{\link[snha:snha]{snha(data)}}{creates and returns a new snha graph}
+#' \item{\link[snha:snha]{snha(data)}}{applys the SNHA method on the data and returns 
+#'    a new snha graph object}
 #' }
 #' S3 methods for snha graphs:
 #' \describe{
@@ -29,6 +30,8 @@
 #' library(MASS)
 #' data(birthwt)
 #' as=snha(birthwt[,-1])
+#' plot(as)
+#' as$theta
 #' ls(as)
 #' }
 #' \author{Detlef Groth <dgroth@uni-potsdam.de>}
@@ -57,23 +60,23 @@
 #' }
 #' \usage{ snha(data,alpha=0.05,method='pearson',threshold=0.01,check.singles=FALSE,prob=FALSE,prob.threshold=0.2,prob.n=25)}
 #' \arguments{
-#' \item{data}{a dataframe where network nodes are the rownames and data
+#' \item{data}{a data frame where network nodes are the row names and data
 #'             variables are in the columns.}
 #' \item{alpha}{confidence threshold for p-value edge cutting after all chains
 #'              were generated, default: 0.05.}
 #' \item{method}{method to calculate correlation/association values, can be
-#'               pearson, spearman or kendall, default: 'pearson'.}
+#'               'pearson', 'spearman' or 'kendall', default: 'pearson'.}
 #' \item{threshold}{R-squared correlation coefficient threshold for which
 #'           r-square values should be used for chain generation, r=0.1 is r-square of
 #'           0.01, default: 0.01.}
-#' \item{check.singles}{should isolated nodes connected with sufficent high R^2
+#' \item{check.singles}{should isolated nodes connected with sufficient high R^2
 #'           and significance, default: FALSE.}
 #' \item{prob}{should be probabilities computed for each edge using
 #'          bootstrapping. Only in this case the parameters starting with prob are used,
 #'          default: FALSE}
 #' \item{prob.threshold}{threshold to set an edge, a value of 0.5 means, that
 #'          the edge must be found in 50\% of all samplings, default: 0.2}
-#' \item{prob.n}{number of boostrap samples to be taken, default: 25}
+#' \item{prob.n}{number of bootstrap samples to be taken, default: 25}
 #' }
 #' \keyword{network, correlation}
 #' \value{A snha graph data object with the fields theta for the adjacency
@@ -88,7 +91,7 @@
 #' round(sw.g$sigma,2)
 #' sw.g=snha(swiss,method='spearman',check.singles=TRUE,prob=TRUE)
 #' sw.g$theta
-#' sw.g$probablities
+#' sw.g$probabilities
 #' }
 #' \seealso{ \link[snha:plot.snha]{plot.snha}}
 #' 
@@ -170,7 +173,7 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
 #' \alias{snha_get_chains}
 #' \title{Return the chains of an snha graph as data frame}
 #' \usage{snha_get_chains(graph)}
-#' \description{This is a utiltiy function to return the chains which
+#' \description{This is a utility function to return the chains which
 #' constructs the graph as a matrix.}
 #' \arguments{
 #' \item{graph}{a snha graph object}
@@ -212,7 +215,7 @@ snha_get_chains <- function (graph) {
 #' }
 #' \value{list with the following components: 'll.total', 'll.chain',
 #' 'll.rest', 'll.block', data frame 'df' with the columns 'chisq', 'p.value',
-#' 'block.df', 'block.ch', 'block.p.value'. If chain is not given an overal
+#' 'block.df', 'block.ch', 'block.p.value'. If chain is not given an overall
 #' summary is made for all chains an returned as data frame.}
 #' \examples{
 #' data(swiss)
@@ -233,8 +236,8 @@ snha_ll = function (g,chain=NULL) {
 
 #' \name{snha_rsquare}
 #' \alias{snha_rsquare}
-#' \title{linear model r-square values for given data and graph}
-#' \description{ The function `snha_.rsquare` calculates for given data and 
+#' \title{linear model based r-square values for given data and graph}
+#' \description{ The function `snha_rsquare` calculates for given data and 
 #' a graph the covered r-squared values by  a linear model for each node. 
 #' The linear model predicts each node by an additive mode 
 #' using it's neighbor nodes in the graph.}
@@ -307,6 +310,7 @@ snha_rsquare = function (data,g=NULL) {
 
 
 #' \name{snha_graph2data}
+#'
 #' \alias{snha_graph2data}
 #' \title{create correlated data for the given adjacency matrix representing
 #' a directed graph or an undirected graph}
@@ -325,7 +329,7 @@ snha_rsquare = function (data,g=NULL) {
 #' \item{method}{method for data generation, either 'mc' for using Monte Carlo
 #' simulation or 'pc' for using a precision matrix, default: 'mc'}
 #' }
-#' \value{matrix with the nodenames as rows and samplings in the columns}
+#' \value{matrix with the node names as rows and samplings in the columns}
 #'\examples{
 #' par(mfrow=c(1,2),mai=rep(0.2,4))
 #' A=matrix(0,nrow=6,ncol=6)
@@ -340,7 +344,14 @@ snha_rsquare = function (data,g=NULL) {
 #' P=snha(t(data))
 #' plot(P,layout="circle")
 #' }
-#'
+#' \references{
+#' \itemize{
+#' \item Novine, M., Mattsson, C. C., & Groth, D. (2021).
+#' Network reconstruction based on synthetic data generated by a Monte Carlo approach. 
+#' \emph{Human Biology and Public Health}, 3:26.
+#' \url{ https://doi.org/10.52905/hbph2021.3.26}
+#' }}
+#' 
 
 snha_graph2data <- function (g,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,method="mc") {
     A=g
@@ -386,17 +397,20 @@ snha_graph2data <- function (g,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,met
 # methods for a snha graph
 
 #' \name{plot.snha}
+#'
 #' \alias{plot.snha}
-#' \title{display network orcorrelation matrices of snha graphs}
-#' \description{The function `plot.snha` provides a simple display of network graphs correlation matrices using 
-#' filled circles (vertices) to represent variables and edges which connect the vertices with high absolute. 
-#' correlation values. Positive correlations are shown in black, negative
-#' correlations are shown in red. For more information see the details
-#' section.}
-#' \details{This is a small plot utility to display networks or correlation matrices of snha graph objects. 
-#'          In case of boostrapping the graph by using the `snha` function with the `prob=TRUE` 
+#' \title{display network or correlation matrices of snha graphs}
+#' \description{The function `plot.snha` provides a simple display of network 
+#'   graphs correlation matrices using  filled circles (vertices) to represent
+#'   variables and edges which connect the vertices with high absolute. 
+#'   correlation values. Positive correlations are shown in black, negative
+#'   correlations are shown in red. For more information see the details
+#'   section.
+#' }
+#' \details{This is a plot function to display networks or correlation matrices of snha graph objects. 
+#'          In case of bootstrapping the graph by using the `snha` function with the `prob=TRUE` 
 #'          option full, broken and dotted lines are drawn per default if the
-#'          are found in more than 75, 50 or 25 percent of all resamplings. You
+#'          are found in more than 75, 50 or 25 percent of all re-samplings. You
 #'          can change this by using the `threshold` argument.}
 #' \usage{
 #' \method{plot}{snha}(
@@ -424,46 +438,44 @@ snha_graph2data <- function (g,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,met
 #' }
 #' \arguments{
 #' \item{x}{snha graph object usually results of the snha function or an
-#' adjacency matrix}
+#'          adjacency matrix}
 #' \item{type}{character string specifying the plot type either 'network' or
-#' 'cor', default: 'network'}
+#' '         cor', default: 'network'}
 #' \item{layout}{graph layout for plotting one of 'circle', 'sam', 'samd',
-#' 'grid', 'mds', 'mdsd', 'star', default: 'circle'}
+#'           'grid', 'mds', 'mdsd', 'star', default: 'circle'}
 #' \item{vertex.color}{default color for the vertices, either a single value,
-#' all vertices have hen this color or a vector of values, for different colors
-#' for the nodes, default: 'salmon'}
-#' \item{cex}{size of the vertex labels which are plotted on the vertices,
-#' default: 1}
-#' \item{vertex.size}{number how large the vertices should be plotted, default:
-#' 5}
+#'            all vertices have hen this color or a vector of values,
+#'            for different colors for the nodes, default: 'salmon'}
+#' \item{cex}{size of the vertex labels which are plotted on the vertices, default: 1}
+#' \item{vertex.size}{number how large the vertices should be plotted, default: 5}
 #' \item{edge.width}{number on how strong the edges should be plotted, if
-#' edge.width=0, then the number is based on the correlation values, default:
-#' 2}
-#' \item{edge.color}{color to be plotted for edges. Usually vector of length
-#' two. First color for positive correlations, second color for negative
-#' corrleations. Default: c('grey','red')}
+#'           edge.width=0, then the number is based on the correlation values, 
+#'           default: 2}
+#' \item{edge.color}{color to be plotted for edges. Usually vector of length two.
+#'           First color for positive correlations, second color for negative
+#'           correlations. Default: c('grey','red')}
 #' \item{edge.text}{optional matrix to give edge labels, default: NULL}
 #' \item{edge.cex}{character expansion for edge labels, default: 0.8}
-#' \item{edge.pch}{plotting character which should be placed below the
-#' edge.text, default: 0}
+#' \item{edge.pch}{plotting character which should be placed below the edge.text,
+#'            default: 0}
 #' \item{noise}{should be noise added to the layout. Sometimes useful if nodes
-#' are too close. Default: FALSE}
-#' \item{hilight.chain}{which chain should be highlighted, default: NULL (no
-#' chain highlight)}
+#'            are too close. Default: FALSE}
+#' \item{hilight.chain}{which chain should be highlighted, 
+#'            default: NULL (no chain highlight)}
 #' \item{chain.color}{which color for chain edges, default: black}
 #' \item{star.center}{the centered node if layout is 'start', must be
-#' a character string for the nodename, default: NULL}
+#'            a character string for the node name, default: NULL}
 #' \item{plot.labels}{should node labels plotted, default: TRUE}
 #' \item{lty}{line type for standard edges in the graph, default: 1}
 #' \item{threshold}{cutoff values for bootstrap probabilities for drawing edges
-#' as dotted. broken lines and solid lines, default: c(0.25,0.5,0.75)}
+#'          as dotted, broken lines and solid lines, default: c(0.25,0.5,0.75)}
 #' \item{interactive}{switch into interactive mode where you can click in the
-#' graph and move nodes with two clicks, first selecting the node, second click
-#' gives thehe new coordinates for the node, default: FALSE}
-#' \item{\dots}{curently not used}
+#'          graph and move nodes with two clicks, first selecting the node,
+#'          second click gives the new coordinates for the node, default: FALSE}
+#' \item{\dots}{currently not used}
 #' }
-#' \value{returns the layout of the plotted network or NULL if type is corplot
-#' (invisible)}
+#' \value{returns the layout of the plotted network or NULL if type is `corrplot`
+#'         (invisible)}
 #' \examples{ 
 #' data(swiss)
 #' sw.g=snha(swiss,method='spearman')
@@ -494,7 +506,8 @@ plot.snha = function (x,type='network',
                      layout='circle',
                      vertex.color='salmon',cex=1,
                      vertex.size=5,edge.width=2,
-                     edge.color=c('grey70','red'),edge.text=NULL,edge.cex=0.8,edge.pch=0,
+                     edge.color=c('grey70','red'),
+                     edge.text=NULL,edge.cex=0.8,edge.pch=0,
                      noise=FALSE, 
                      hilight.chain=NULL,
                      chain.color=c('black','red'),
@@ -684,12 +697,13 @@ plot.snha = function (x,type='network',
 
 #' \name{as.list.snha}
 #' \alias{as.list.snha}
+#'
 #' \title{return a list representation for an snha graph object}
-#' \description{`as.list.snha` provides a S3 method to convert an snha graph object
-#'              into a list object which can be for instance used to write a report
-#'               using the library openxlsx.}
+#' \description{The function `as.list.snha` provides a S3 method to convert
+#'     a snha graph object into a list object which can be for instance used 
+#'     to write a report into an XLSX file  using the library openxlsx.}
 #' \arguments{
-#' \item{x}{ a snha graph object created with the snha function}
+#' \item{x}{ snha graph object created with the snha function}
 #' \item{\ldots}{ additional arguments, delegated to the list command}
 #' }
 #' \value{list object with the components 'theta', 'sigma', 'p.value'}
@@ -720,24 +734,34 @@ as.list.snha = function (x,...) {
 }
 
 #' \name{snha_layout}
+#'
 #' \alias{snha_layout}
-#' \title{Determine graph layouts.}
-#' \description{ This function returns xy coordinates for a given input adjacency matrix or snha graph. 
-#' This function is useful if you like to plot the same set of nodes with different edge connections 
-#' in the same layout.}
+#' \title{Determine graph layouts}
+#' \usage{snha_layout(A,
+#'    mode='sam',
+#'    method='pearson', 
+#'    noise=FALSE, 
+#'    star.center=NULL,
+#'    interactive=FALSE)
+#' }
+#' \description{This function returns xy coordinates for a given input
+#'       adjacency matrix or snha graph. It is useful if you like to plot
+#'       the same set of nodes with different edge connections 
+#'       in the same layout.}
 #' \arguments{
 #' \item{A}{an adjacency matrix or an snha graph object}
-#' \item{mode}{character string for the layout type, can be either 'mds' (mds
-#' on graph), 'mdsd' (mds on data) 'sam' (sammon on graph), 'samd' (sammon on
-#' data), 'circle', 'grid' or 'star', default: 'sam'}
+#' \item{mode}{character string for the layout type, can be either 
+#'      'mds' (mds on graph using shortest paths), 'mdsd' (mds on data)
+#'      'sam' (sammon on graph), 'samd' (sammon on data),
+#'      'circle', 'grid' or 'star', default: 'sam'}
 #' \item{method}{method for calculating correlation distance if mode is either
-#' 'mdsd' or 'samd', default: 'pearson'}
+#'       'mdsd' or 'samd', default: 'pearson'}
 #' \item{noise}{should some noise be added, default: FALSE}
 #' \item{star.center}{the centered node if layout is 'star', must be
-#' a character string for the nodename, default: NULL}
+#'           a character string for the node name, default: NULL}
 #' \item{interactive}{switch into interactive mode where you can click in the
-#' graph and move nodes with two clicks, first selecting the node, second click
-#' gives the new coordinates for the node, default: FALSE}
+#'        graph and move nodes with two clicks, first selecting the node, second click
+#'        gives the new coordinates for the node, default: FALSE}
 #' }
 #' \keyword{network, layout}
 #' \value{matrix with x and y columns for the layout}
@@ -755,7 +779,6 @@ as.list.snha = function (x,...) {
 #' plot(snha(nswiss,method='spearman'),layout='samd',
 #'   vertex.size=2,vertex.color='beige')
 #' }
-
 snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center=NULL,interactive=FALSE) {
     if (mode %in% c('samd','mdsd')) {
         if(class(A)[1] == "snha") {

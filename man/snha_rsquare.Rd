@@ -1,7 +1,7 @@
 \name{snha_rsquare} 
 \alias{snha_rsquare} 
-\title{linear model r-square values for given data and graph} 
-\description{ The function `snha_.rsquare` calculates for given data and  
+\title{linear model based r-square values for given data and graph} 
+\description{ The function `snha_rsquare` calculates for given data and  
 a graph the covered r-squared values by  a linear model for each node.  
 The linear model predicts each node by an additive mode  
 using it's neighbor nodes in the graph.} 

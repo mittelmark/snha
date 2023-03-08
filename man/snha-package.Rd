@@ -2,11 +2,12 @@
 \alias{snha-package} 
 \title{ snha package - association chain graphs from correlation networks} 
 \description{ The snha package can be used to construct association chain graphs  
-   based on the St. Nicolas House algorithm as described in Groth et. 2019.} 
+   based on the St. Nicolas House algorithm as described in Groth et. al. 2019.} 
 \details{The package provides the following functions: 
 Function for graph generation from data: 
 \describe{ 
-\item{\link[snha:snha]{snha(data)}}{creates and returns a new snha graph} 
+\item{\link[snha:snha]{snha(data)}}{applys the SNHA method on the data and returns  
+   a new snha graph object} 
 } 
 S3 methods for snha graphs: 
 \describe{ 
@@ -29,6 +30,8 @@ adjacency matrix some data with the appropiate correlations}
 library(MASS) 
 data(birthwt) 
 as=snha(birthwt[,-1]) 
+plot(as) 
+as$theta 
 ls(as) 
 } 
 \author{Detlef Groth <dgroth@uni-potsdam.de>} 
