@@ -20,7 +20,7 @@ LL.getLL = function (data,cor.method='pearson',cols=c()) {
 }
 
 LL.getChainLL = function (data,chain) {
-    if (class(chain)=="character") {
+    if (is.character(chain)) {
         # given as colnames
         # extract indices and keep order
         cnames=1:ncol(data)
@@ -79,7 +79,7 @@ LL.makeDF = function (data,chains) {
             newDF=cbind(newDF,llres[[ln]])
             colnames(newDF)[ncol(newDF)]=ln
         }
-        if (class(resDF) == "NULL") {
+        if (is.null(resDF)) {
             resDF=newDF 
         } else {
             resDF=rbind(resDF,newDF)

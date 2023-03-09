@@ -1,5 +1,7 @@
 ^\.git$
-^\.img$
+^bin$
+^img$
+^snha-tutorial.pdf$
 ^\.\.Rcheck$
 ^\.Rbuildignore~$
 ^Makefile$

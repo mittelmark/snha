@@ -29,7 +29,8 @@
        graph and move nodes with two clicks, first selecting the node, second click 
        gives the new coordinates for the node, default: FALSE} 
 } 
-\keyword{network, layout} 
+\keyword{network} 
+\keyword{layout} 
 \value{matrix with x and y columns for the layout} 
 \examples{ 
 data(swiss) 

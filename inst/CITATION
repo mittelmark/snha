@@ -1,23 +1,23 @@
 citHeader("To cite the snha package in publications, please use:")
 
-
-citEntry(entry = "manual",
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+bibentry(bibtype="Manual",
     title = "{snha}: {P}ackage for creating correlation networks using the St.
 Nicolas House Algorithm.",
     author = "Detlef Groth",
     organization = "University of Potsdam",
     address = "Potsdam, Germany",
-    note = "version 0.1",
-    year = "2023",
-    url = "http://github.com/mittelmark/snha",
-    textVersion  = paste("Groth, D. (2023).",
-        "snha: Package for creating correlation networks using the St. Nicolas
-House Algorithm.",
-        "version 0.1. University of Potsdam, Germany.",
-        "http://github.com/mittelmark/snha")
+    note = note,
+    year = year,
+    url = "https://github.com/mittelmark/snha",
+    textVersion  = paste0("Groth, D. (",year,").",
+        "snha: Package for creating correlation networks using the St. Nicolas House Algorithm. ",note,
+        " University of Potsdam, Germany.",
+        "https://github.com/mittelmark/snha")
 )
 
-citEntry(entry="article",
+bibentry(bibtype="Article",
     title="{B}ody height in stunted {I}ndonesian children depends directly 
      on parental education and not via a nutrition mediated pathway-Evidence
 from tracing association chains by {S}t. {N}icolas {H}ouse {A}nalysis.",
@@ -26,15 +26,15 @@ from tracing association chains by {S}t. {N}icolas {H}ouse {A}nalysis.",
     journal="Anthropologischer Anzeiger",
     volumne="76(5)",
     pages="445--451",
-    doi="https://doi.org/10.1127/anthranz/2019/1027",
+    doi="10.1127/anthranz/2019/1027",
     textVersion=paste("Groth, D., Scheffler, C., & Hermanussen, M. (2019).",
     "Body height in stunted Indonesian children depends directly on parental
 education and not via a nutrition mediated pathway-Evidence from tracing
 association chains by St. Nicolas House Analysis.",
-"Anthropologischer Anzeiger, 76(5), 445-451. doi: 10.1127/anthranz/2019/1027.")
+"Anthropologischer Anzeiger, 76(5), 445-451.")
 )
 
-citEntry(entry="article",
+bibentry(bibtype="Article",
     title="{C}hain {R}eversion for {D}etecting {A}ssociations in {I}nteracting
            {V}ariables - {S}t. {N}icolas {H}ouse {A}nalysis.", 
     author="Hermanussen, M., Aßmann, C., & Groth, D.",
@@ -43,11 +43,11 @@ citEntry(entry="article",
 health",
     volume="18(4)",
     pages="1741",
-    doi="https://doi.org/10.3390/ijerph18041741",
     textVersion=paste("Hermanussen, M., Aßmann, C., & Groth, D. (2021).",
     "Chain Reversion for Detecting Associations in Interacting Variables — 
      St. Nicolas House Analysis.",
     "International journal of environmental research and public health, 18(4),
 1741.",
-    "doi: 10.3390/ijerph18041741")
+    doi="10.3390/ijerph18041741")
+
 )

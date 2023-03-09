@@ -10,9 +10,9 @@ Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
 Description: 
     R package for creating correlation networks using St. Nicolas House Analysis. 
     The package can be used for visualizing multivariate data like Principal
-    Component Analysis (PCA) or Multidimensional Scaling (MDS). In contrast to
-    these methods, SNHA uses a network approach to explore interacting variables. 
-    For details see Hermanussen et. al. 2021, <doi:110.3390/ijerph18041741>.
+    Component Analysis or Multidimensional Scaling . In contrast to
+    these methods, 'SNHA' uses a network approach to explore interacting variables. 
+    For details see 'Hermanussen et. al. 2021', <doi:10.3390/ijerph18041741>.
 URL:  https://github.com/mittelmark/snha
 BugReports: https://github.com/mittelmark/snha/issues
 Depends: R (>= 3.5.0)
@@ -20,6 +20,7 @@ Imports: MASS
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 License: MIT + file LICENSE
+LazyData: yes
 Language: en-US
 Encoding: UTF-8
 NeedsCompilation: no

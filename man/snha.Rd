@@ -34,7 +34,8 @@
          the edge must be found in 50\% of all samplings, default: 0.2} 
 \item{prob.n}{number of bootstrap samples to be taken, default: 25} 
 } 
-\keyword{network, correlation} 
+\keyword{network} 
+\keyword{correlation} 
 \value{A snha graph data object with the fields 'theta' for the adjacency 
       matrix, 'sigma' for the correlation matrix, 'chains' for the association chains 
       and 'data' representing the original input data.} 
