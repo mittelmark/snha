@@ -5,7 +5,16 @@
     The main entry function to initialize a snha object with data where 
     variables are in columns and items are in rows 
 } 
-\usage{ snha(data,alpha=0.05,method='pearson',threshold=0.01,check.singles=FALSE,prob=FALSE,prob.threshold=0.2,prob.n=25)} 
+\usage{snha( 
+  data, 
+  alpha=0.05, 
+  method='pearson', 
+  threshold=0.01, 
+  check.singles=FALSE, 
+  prob=FALSE, 
+  prob.threshold=0.2, 
+  prob.n=25) 
+} 
 \arguments{ 
 \item{data}{a data frame where network nodes are the row names and data 
             variables are in the columns.} 
@@ -26,9 +35,9 @@
 \item{prob.n}{number of bootstrap samples to be taken, default: 25} 
 } 
 \keyword{network, correlation} 
-\value{A snha graph data object with the fields theta for the adjacency 
-      matrix, sigma for the correlation matrix, chains for the association chains 
-      and data representing the input data.} 
+\value{A snha graph data object with the fields 'theta' for the adjacency 
+      matrix, 'sigma' for the correlation matrix, 'chains' for the association chains 
+      and 'data' representing the original input data.} 
 \examples{ 
 data(swiss) 
 sw.g=snha(swiss,method='spearman') 

@@ -9,11 +9,12 @@
   correlations are shown in red. For more information see the details 
   section. 
 } 
-\details{This is a plot function to display networks or correlation matrices of snha graph objects.  
+\details{This is a plot function to display networks or correlation matrices 
+         of 'snha' graph objects.  
          In case of bootstrapping the graph by using the `snha` function with the `prob=TRUE`  
-         option full, broken and dotted lines are drawn per default if the 
-         are found in more than 75, 50 or 25 percent of all re-samplings. You 
-         can change this by using the `threshold` argument.} 
+         option lines in style full, broken and dotted lines are drawn if 
+         they are found in more than 75, 50 or 25 percent of all re-samplings. 
+         You can change these limits by using the `threshold` argument.} 
 \usage{ 
 \method{plot}{snha}( 
  x, 
@@ -39,7 +40,7 @@
 ) 
 } 
 \arguments{ 
-\item{x}{snha graph object usually results of the snha function or an 
+\item{x}{snha graph object usually created with the 'snha' function or an 
          adjacency matrix} 
 \item{type}{character string specifying the plot type either 'network' or 
 '         cor', default: 'network'} 

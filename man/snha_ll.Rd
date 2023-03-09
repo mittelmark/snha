@@ -1,10 +1,11 @@
 \name{snha_ll} 
 \alias{snha_ll} 
 \title{log-likelihood for the given snha graph and the given chain} 
+\usage{snha_ll(graph,chain=NULL)} 
 \description{This function returns the log-likelihood for the given snha 
 graph and the given chain.} 
 \arguments{ 
-\item{g}{a snha graph object} 
+\item{graph}{a snha graph object} 
 \item{chain}{a chain object of a snha graph, if not given a data frame with 
 the values is returned for all chains, default: NULL} 
 } 

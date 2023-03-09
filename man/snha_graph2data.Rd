@@ -1,12 +1,22 @@
 \name{snha_graph2data} 
- 
 \alias{snha_graph2data} 
 \title{create correlated data for the given adjacency matrix representing 
 a directed graph or an undirected graph} 
+\usage{snha_graph2data( 
+  A, 
+  n=100, 
+  iter=50, 
+  val=100, 
+  sd=2, 
+  prop=0.025, 
+  noise=1, 
+  method="mc" 
+  ) 
+} 
 \description{This function is a short implementation of the Monte Carlo 
 algorithm described in Novine et. al. 2022.} 
 \arguments{ 
-\item{g}{an adjacency matrix} 
+\item{A}{an adjacency matrix} 
 \item{n}{number of values, measurements per node, default: 100} 
 \item{iter}{number of iterations, default: 50} 
 \item{sd}{initial standard deviation, default: 2} 

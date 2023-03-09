@@ -20,14 +20,14 @@ A data frame with 33 rows and 10 columns:
 }
 }
 \source{
-<https://en.wikipedia.org/wiki/Athletics_at_the_1988_Summer_Olympics_%E2%80%93_Men%27s_decathlon>
+<https://en.wikipedia.org/wiki/Athletics_at_the_1988_Summer_Olympics_-_Men's_decathlon>
 }
 \usage{
 decathlon88
 }
 \description{
-A subset of data from the Decathlon frim the 1988 Olympics game. 
-Included are all athlets which finished and have more than 7000 points.
+A subset of data from the Decathlon from the 1988 Olympic games. 
+Included are all athletes which finished with more than 7000 points.
 }
 \examples{
 data(decathlon88)

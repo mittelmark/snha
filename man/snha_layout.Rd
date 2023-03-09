@@ -2,7 +2,8 @@
  
 \alias{snha_layout} 
 \title{Determine graph layouts} 
-\usage{snha_layout(A, 
+\usage{snha_layout( 
+   A, 
    mode='sam', 
    method='pearson',  
    noise=FALSE,  

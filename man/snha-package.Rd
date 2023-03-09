@@ -1,8 +1,9 @@
 \name{snha-package} 
 \alias{snha-package} 
 \title{ snha package - association chain graphs from correlation networks} 
-\description{ The snha package can be used to construct association chain graphs  
-   based on the St. Nicolas House algorithm as described in Groth et. al. 2019.} 
+\description{The snha package can be used to construct association chain graphs  
+   based on the St. Nicolas House Analysis (SNHA) algorithm as described in Groth et. al. 2019. 
+   and Hermanussen et. al. 2021.} 
 \details{The package provides the following functions: 
 Function for graph generation from data: 
 \describe{ 
@@ -11,19 +12,22 @@ Function for graph generation from data:
 } 
 S3 methods for snha graphs: 
 \describe{ 
-\item{\link[snha:plot.snha]{plot.snha(snhaobject)}}{plots a snha graph} 
-\item{\link[snha:as.list.snha]{as.list.snha(snhaobject)}}{return a list 
+\item{\link[snha:plot.snha]{plot.snha(x)}}{plots a snha graph} 
+\item{\link[snha:as.list.snha]{as.list.snha(x)}}{return a list 
    representation of a snha graph object} 
 } 
 Utility functions: 
 \describe{ 
-\item{\link[snha:snha_get_chains]{snha_get_chains(snhagraph)}}{returns the chains found by the algorithm as matrix} 
+\item{\link[snha:snha_get_chains]{snha_get_chains(g)}}{returns the chains found  
+       by the algorithm as matrix} 
 \item{\link[snha:snha_graph2data]{snha_graph2data(A)}}{create for the given 
-adjacency matrix some data with the appropiate correlations} 
-\item{\link[snha:snha_layout]{snha_layout(g)}}{calculate layout coordinates for the given graph or adjacency matrix} 
-\item{\link[snha:snha_ll]{snha_ll(g,chain)}}{calculate log-likelihood for the given chain of the snha graph} 
-\item{\link[snha:snha_rsquare]{snha_rsquare(data,g)}}{for given data and graph or adjacency matrix calculate  
-   linear model r-square value} 
+       adjacency matrix some data with the appropiate correlations} 
+\item{\link[snha:snha_layout]{snha_layout(g)}}{calculate layout coordinates  
+       for the given graph or adjacency matrix} 
+\item{\link[snha:snha_ll]{snha_ll(g,chain)}}{calculate log-likelihood for  
+       the given chain of the snha graph} 
+\item{\link[snha:snha_rsquare]{snha_rsquare(data,g)}}{for given data and graph  
+        or adjacency matrix calculate linear model r-square value} 
 } 
 } 
 \examples{ 
@@ -42,7 +46,7 @@ ls(as)
     via a nutrition mediated pathway -  
     Evidence from tracing association chains by St. Nicolas House Analysis.  
     \emph{Anthropologischer Anzeiger}, 76 No. 5 (2019), p. 445 - 451. \url{https://doi.org/10.1127/anthranz/2019/1027} 
-   \item Hermanussen, M., Assmann, C. und Groth, D. (2021). 
+   \item Hermanussen, M., Assmann, & Groth, D. (2021). 
    Chain Reversion for Detecting Associations in Interacting Variables - St. Nicolas House Analysis. 
    \emph{International Journal of Environmental Research and Public Health}. 18, 4 (2021). \url{https://doi.org/10.3390/ijerph18041741}. 
    \item Novine, M., Mattsson, C. C., & Groth, D. (2021). 

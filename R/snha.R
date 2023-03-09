@@ -1,8 +1,9 @@
 #' \name{snha-package}
 #' \alias{snha-package}
 #' \title{ snha package - association chain graphs from correlation networks}
-#' \description{ The snha package can be used to construct association chain graphs 
-#'    based on the St. Nicolas House algorithm as described in Groth et. al. 2019.}
+#' \description{The snha package can be used to construct association chain graphs 
+#'    based on the St. Nicolas House Analysis (SNHA) algorithm as described in Groth et. al. 2019.
+#'    and Hermanussen et. al. 2021.}
 #' \details{The package provides the following functions:
 #' Function for graph generation from data:
 #' \describe{
@@ -11,19 +12,22 @@
 #' }
 #' S3 methods for snha graphs:
 #' \describe{
-#' \item{\link[snha:plot.snha]{plot.snha(snhaobject)}}{plots a snha graph}
-#' \item{\link[snha:as.list.snha]{as.list.snha(snhaobject)}}{return a list
+#' \item{\link[snha:plot.snha]{plot.snha(x)}}{plots a snha graph}
+#' \item{\link[snha:as.list.snha]{as.list.snha(x)}}{return a list
 #'    representation of a snha graph object}
 #' }
 #' Utility functions:
 #' \describe{
-#' \item{\link[snha:snha_get_chains]{snha_get_chains(snhagraph)}}{returns the chains found by the algorithm as matrix}
+#' \item{\link[snha:snha_get_chains]{snha_get_chains(g)}}{returns the chains found 
+#'        by the algorithm as matrix}
 #' \item{\link[snha:snha_graph2data]{snha_graph2data(A)}}{create for the given
-#' adjacency matrix some data with the appropiate correlations}
-#' \item{\link[snha:snha_layout]{snha_layout(g)}}{calculate layout coordinates for the given graph or adjacency matrix}
-#' \item{\link[snha:snha_ll]{snha_ll(g,chain)}}{calculate log-likelihood for the given chain of the snha graph}
-#' \item{\link[snha:snha_rsquare]{snha_rsquare(data,g)}}{for given data and graph or adjacency matrix calculate 
-#'    linear model r-square value}
+#'        adjacency matrix some data with the appropiate correlations}
+#' \item{\link[snha:snha_layout]{snha_layout(g)}}{calculate layout coordinates 
+#'        for the given graph or adjacency matrix}
+#' \item{\link[snha:snha_ll]{snha_ll(g,chain)}}{calculate log-likelihood for 
+#'        the given chain of the snha graph}
+#' \item{\link[snha:snha_rsquare]{snha_rsquare(data,g)}}{for given data and graph 
+#'         or adjacency matrix calculate linear model r-square value}
 #' }
 #' }
 #' \examples{
@@ -42,7 +46,7 @@
 #'     via a nutrition mediated pathway - 
 #'     Evidence from tracing association chains by St. Nicolas House Analysis. 
 #'     \emph{Anthropologischer Anzeiger}, 76 No. 5 (2019), p. 445 - 451. \url{https://doi.org/10.1127/anthranz/2019/1027}
-#'    \item Hermanussen, M., Assmann, C. und Groth, D. (2021).
+#'    \item Hermanussen, M., Assmann, & Groth, D. (2021).
 #'    Chain Reversion for Detecting Associations in Interacting Variables - St. Nicolas House Analysis.
 #'    \emph{International Journal of Environmental Research and Public Health}. 18, 4 (2021). \url{https://doi.org/10.3390/ijerph18041741}.
 #'    \item Novine, M., Mattsson, C. C., & Groth, D. (2021).
@@ -58,7 +62,16 @@
 #'     The main entry function to initialize a snha object with data where
 #'     variables are in columns and items are in rows
 #' }
-#' \usage{ snha(data,alpha=0.05,method='pearson',threshold=0.01,check.singles=FALSE,prob=FALSE,prob.threshold=0.2,prob.n=25)}
+#' \usage{snha(
+#'   data,
+#'   alpha=0.05,
+#'   method='pearson',
+#'   threshold=0.01,
+#'   check.singles=FALSE,
+#'   prob=FALSE,
+#'   prob.threshold=0.2,
+#'   prob.n=25)
+#' }
 #' \arguments{
 #' \item{data}{a data frame where network nodes are the row names and data
 #'             variables are in the columns.}
@@ -79,9 +92,9 @@
 #' \item{prob.n}{number of bootstrap samples to be taken, default: 25}
 #' }
 #' \keyword{network, correlation}
-#' \value{A snha graph data object with the fields theta for the adjacency
-#'       matrix, sigma for the correlation matrix, chains for the association chains
-#'       and data representing the input data.}
+#' \value{A snha graph data object with the fields 'theta' for the adjacency
+#'       matrix, 'sigma' for the correlation matrix, 'chains' for the association chains
+#'       and 'data' representing the original input data.}
 #' \examples{
 #' data(swiss)
 #' sw.g=snha(swiss,method='spearman')
@@ -206,10 +219,11 @@ snha_get_chains <- function (graph) {
 #' \name{snha_ll}
 #' \alias{snha_ll}
 #' \title{log-likelihood for the given snha graph and the given chain}
+#' \usage{snha_ll(graph,chain=NULL)}
 #' \description{This function returns the log-likelihood for the given snha
 #' graph and the given chain.}
 #' \arguments{
-#' \item{g}{a snha graph object}
+#' \item{graph}{a snha graph object}
 #' \item{chain}{a chain object of a snha graph, if not given a data frame with
 #' the values is returned for all chains, default: NULL}
 #' }
@@ -225,7 +239,8 @@ snha_get_chains <- function (graph) {
 #' }
 #'
 
-snha_ll = function (g,chain=NULL) {
+snha_ll = function (graph,chain=NULL) {
+    g=graph
     if (is.null(chain)) {
         return(LL.makeDF(g$data, g$chains))
     } else {
@@ -237,22 +252,24 @@ snha_ll = function (g,chain=NULL) {
 #' \name{snha_rsquare}
 #' \alias{snha_rsquare}
 #' \title{linear model based r-square values for given data and graph}
+#' \usage{snha_rsquare(data,graph=NULL)}
 #' \description{ The function `snha_rsquare` calculates for given data and 
 #' a graph the covered r-squared values by  a linear model for each node. 
 #' The linear model predicts each node by an additive mode 
 #' using it's neighbor nodes in the graph.}
 #' \arguments{
-#' \item{data}{snha graph object or data matrix or data frame where variables
-#' are in columns and samples in rows}
-#' \item{g}{ graph object or adjacency matrix of an (un)directed graph, not
-#' needed if data is an snha graph, default: NULL.}
+#' \item{data}{data matrix or data frame where variables
+#' are in columns and samples in rows or a snha graph}
+#' \item{graph}{ graph object or adjacency matrix of an (un)directed graph, not
+#' needed if data is a snha graph, default: NULL.}
 #' }
 #' \value{vector of rsquare values for each node of the graph}
 #' \examples{ 
-#' # random data
+#' # random adjacency matrix
 #' A=matrix(rbinom(100,1, 0.2),nrow=10,ncol=10)
 #' diag(A)=0
 #' colnames(A)=rownames(A)=LETTERS[1:10]
+#' # random data
 #' data=matrix(rnorm(1000),ncol=10)
 #' colnames(data)=colnames(A)
 #' snha_rsquare(data,A)
@@ -272,7 +289,8 @@ snha_ll = function (g,chain=NULL) {
 #' }
 #'
 
-snha_rsquare = function (data,g=NULL) {
+snha_rsquare = function (data,graph=NULL) {
+    g=graph
     if (any(class(data) %in% "matrix")) {
         data=as.data.frame(data)
     }
@@ -310,14 +328,24 @@ snha_rsquare = function (data,g=NULL) {
 
 
 #' \name{snha_graph2data}
-#'
 #' \alias{snha_graph2data}
 #' \title{create correlated data for the given adjacency matrix representing
 #' a directed graph or an undirected graph}
+#' \usage{snha_graph2data(
+#'   A,
+#'   n=100,
+#'   iter=50,
+#'   val=100,
+#'   sd=2,
+#'   prop=0.025,
+#'   noise=1,
+#'   method="mc"
+#'   )
+#' }
 #' \description{This function is a short implementation of the Monte Carlo
 #' algorithm described in Novine et. al. 2022.}
 #' \arguments{
-#' \item{g}{an adjacency matrix}
+#' \item{A}{an adjacency matrix}
 #' \item{n}{number of values, measurements per node, default: 100}
 #' \item{iter}{number of iterations, default: 50}
 #' \item{sd}{initial standard deviation, default: 2}
@@ -353,8 +381,8 @@ snha_rsquare = function (data,g=NULL) {
 #' }}
 #' 
 
-snha_graph2data <- function (g,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,method="mc") {
-    A=g
+snha_graph2data <- function (A,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,method="mc") {
+    g=A
     res=matrix(0,ncol=n,nrow=nrow(A))
     rownames(res)=rownames(A)
     stopifnot(method %in% c('mc','pm'))
@@ -407,11 +435,12 @@ snha_graph2data <- function (g,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,met
 #'   correlations are shown in red. For more information see the details
 #'   section.
 #' }
-#' \details{This is a plot function to display networks or correlation matrices of snha graph objects. 
+#' \details{This is a plot function to display networks or correlation matrices
+#'          of 'snha' graph objects. 
 #'          In case of bootstrapping the graph by using the `snha` function with the `prob=TRUE` 
-#'          option full, broken and dotted lines are drawn per default if the
-#'          are found in more than 75, 50 or 25 percent of all re-samplings. You
-#'          can change this by using the `threshold` argument.}
+#'          option lines in style full, broken and dotted lines are drawn if
+#'          they are found in more than 75, 50 or 25 percent of all re-samplings.
+#'          You can change these limits by using the `threshold` argument.}
 #' \usage{
 #' \method{plot}{snha}(
 #'  x,
@@ -437,7 +466,7 @@ snha_graph2data <- function (g,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,met
 #' )
 #' }
 #' \arguments{
-#' \item{x}{snha graph object usually results of the snha function or an
+#' \item{x}{snha graph object usually created with the 'snha' function or an
 #'          adjacency matrix}
 #' \item{type}{character string specifying the plot type either 'network' or
 #' '         cor', default: 'network'}
@@ -697,8 +726,8 @@ plot.snha = function (x,type='network',
 
 #' \name{as.list.snha}
 #' \alias{as.list.snha}
-#'
 #' \title{return a list representation for an snha graph object}
+#' \usage{\method{as.list}{snha}(x,...)}
 #' \description{The function `as.list.snha` provides a S3 method to convert
 #'     a snha graph object into a list object which can be for instance used 
 #'     to write a report into an XLSX file  using the library openxlsx.}
@@ -706,7 +735,13 @@ plot.snha = function (x,type='network',
 #' \item{x}{ snha graph object created with the snha function}
 #' \item{\ldots}{ additional arguments, delegated to the list command}
 #' }
-#' \value{list object with the components 'theta', 'sigma', 'p.value'}
+#' \value{list object with the components: 
+#'   'chains' (the association chain),
+#'   'data' (original data),
+#'   'theta' (adjacency matrix, 
+#'   'sigma' (correlations), 
+#'   'p.value' (correlation p-values)
+#' }
 #' \examples{ 
 #' data(swiss)
 #' as=snha(swiss,method="spearman",alpha=0.1)
@@ -717,11 +752,11 @@ plot.snha = function (x,type='network',
 #' # library(openxlsx)
 #' # write.xlsx(result,file="some-result.xlsx")
 #' }
-#' \seealso{\link[snha:plot.snha]{plot.snha}}
+#' \seealso{\link[snha:plot.snha]{plot.snha}, \link[snha:snha]{snha}}
 #'
 
 
-as.list.snha = function (x,...) {
+as.list.snha <- function (x,...) {
     df=as.data.frame(unlist(lapply(x$chains,paste,collapse=", ")))
     colnames(df)[1]="chain"
     return(
@@ -737,7 +772,8 @@ as.list.snha = function (x,...) {
 #'
 #' \alias{snha_layout}
 #' \title{Determine graph layouts}
-#' \usage{snha_layout(A,
+#' \usage{snha_layout(
+#'    A,
 #'    mode='sam',
 #'    method='pearson', 
 #'    noise=FALSE, 
