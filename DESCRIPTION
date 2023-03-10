@@ -1,6 +1,6 @@
 Package: snha
 Type: Package
-Title: St. Nicolas House Analysis for R
+Title: Correlation networks using St. Nicolas House Analysis
 Version: 0.1.1
 Date: 2023-05-10
 Authors@R: c(person("Detlef","Groth", role=c("aut", "cre"),
@@ -8,9 +8,9 @@ Authors@R: c(person("Detlef","Groth", role=c("aut", "cre"),
                     comment=c(ORCID="0000-0002-9441-3978")))
 Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
 Description: 
-    R package for creating correlation networks using St. Nicolas House Analysis. 
-    The package can be used for visualizing multivariate data like Principal
-    Component Analysis or Multidimensional Scaling . In contrast to
+    Create correlation networks using St. Nicolas House Analysis. 
+    The package can be used for visualizing multivariate data similar to Principal
+    Component Analysis or Multidimensional Scaling. In contrast to
     these methods, 'SNHA' uses a network approach to explore interacting variables. 
     For details see 'Hermanussen et. al. 2021', <doi:10.3390/ijerph18041741>.
 URL:  https://github.com/mittelmark/snha

@@ -133,7 +133,6 @@ Asgp$data2chainGraph = function (data,method='pearson',
         #cormt[is.na(cormt)]=0
         cor.p.value=self$corTest(data,method=method,p.adjust=p.adjust)$p.value 
     }
-    #print(threshold)
     # if all pairs are NA
     cor.p.value[is.na(cormt)]=1
     cormt[is.na(cormt)]=0
@@ -143,7 +142,6 @@ Asgp$data2chainGraph = function (data,method='pearson',
     A=matrix(0,nrow=ncol(data),ncol=ncol(data))
     colnames(A)=rownames(A)=colnames(data)
     for (edge in edgelist) {
-        # print(edge)
         nodes=strsplit(edge,"--")[[1]]
         A[nodes[1],nodes[2]]=A[nodes[2],nodes[1]]=1
     }
@@ -185,7 +183,6 @@ Asgp$corTest = function (data,method='pearson',p.adjust='none') {
         r=cor(M,use="pairwise.complete.obs")
         ncd=ncol(M)
         #N=unlist(sapply(1:(ncd-1), function(i) sapply((i+1):ncd, function(j) nrow(na.omit(M[,c(i,j)])))) )
-        #print(length(N))
         N=c()
         for (i in 1:(ncd-1)) {
             for (j in (i+1):ncd) {
@@ -216,7 +213,6 @@ Asgp$corTest = function (data,method='pearson',p.adjust='none') {
     options(warn=0)
     rownames(p.value)=colnames(p.value)=colnames(data)
     if (p.adjust != "none") {
-        #print("correcting")
         p.adj=p.adjust(p.value[upper.tri(p.value)],method=p.adjust)
         p.value[upper.tri(p.value)]=p.adj
         p.value[lower.tri(p.value)]=t(p.value)[lower.tri(p.value)]

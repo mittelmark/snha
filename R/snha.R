@@ -30,6 +30,7 @@
 #'         or adjacency matrix calculate linear model r-square value}
 #' }
 #' }
+#' \value{No return value} 
 #' \examples{
 #' library(MASS)
 #' data(birthwt)
@@ -200,8 +201,7 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
 #' \arguments{
 #' \item{graph}{a snha graph object}
 #' }
-#' \value{matrix with one chain per row, shorter chains are filled up with
-#' empty strings}
+#' \value{matrix with one chain per row, shorter chains are filled up with empty strings}
 #' \examples{
 #' data(swiss)
 #' sw.g=snha(swiss)
@@ -616,7 +616,6 @@ plot.snha = function (x,type='network',
             plot(xy,pch=19,col="salmon",cex=vertex.size,axes=FALSE,xlab="",ylab="",
                  xlim=xlim,ylim=ylim,...)
             directed=!identical(theta,t(theta))
-            print(paste("directed:",directed))
             for (i in 1:(nrow(theta))) {
                 for (j in 1:nrow(theta)) {
                     if (i == j) { next }
@@ -690,7 +689,6 @@ plot.snha = function (x,type='network',
                         cmatrix[y,x]=1
                     }
                 }
-                #print(cmatrix)
             }
             if (interactive) {
                 print("click two times, first on the point to move, second where to move\nEnd with one or two right clicks!")
@@ -855,7 +853,6 @@ snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center
             if (nrow(idx)>1) {
                 for (i in 1:nrow(idx)) {
                     # add noise to nodes on the same point
-                    #print(i)
                     n=idx[i,1]
                     xy[n,1]=xy[n,1]+rnorm(1,mean=0,sd=0.1)
                     xy[n,2]=xy[n,2]+rnorm(1,mean=0,sd=0.1)

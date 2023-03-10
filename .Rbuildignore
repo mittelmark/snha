@@ -6,3 +6,4 @@
 ^\.Rbuildignore~$
 ^Makefile$
 \.swo$
+^LICENSE.md$
