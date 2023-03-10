@@ -1,7 +1,7 @@
 Package: snha
 Type: Package
 Title: St. Nicolas House Analysis for R
-Version: 0.1.0
+Version: 0.1.1
 Date: 2023-05-10
 Authors@R: c(person("Detlef","Groth", role=c("aut", "cre"),
                      email = "dgroth@uni-potsdam.de",

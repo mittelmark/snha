@@ -1,4 +1,4 @@
-VERSION := 0.1.0
+VERSION := 0.1.1
 PKG     := $(shell basename `pwd`)
 build: man/snha.Rd
 	R CMD build .

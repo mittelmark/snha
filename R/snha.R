@@ -714,7 +714,7 @@ plot.snha = function (x,type='network',
                 print("click two times, first on the point to move, second where to move\nEnd with one or two right clicks!")
                 while (TRUE) {
                     loc=locator(2)
-                    if (class(loc) == "NULL" | class(loc$x[2]) == "NULL" | class(loc$x[1]) == "NULL") {
+                    if (is.null(loc) | is.null(loc$x[2]) | is.null(loc$x[1])) {
                         break
                     }
                     dlay=rbind(lay,c(loc$x[1],loc$y[1]))
@@ -944,7 +944,7 @@ snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center
         lay=xy
         while (TRUE) {
             loc=locator(2)
-            if (class(loc) == "NULL" | class(loc$x[2]) == "NULL" | class(loc$x[1]) == "NULL") {
+            if (is.null(loc) | is.null(loc$x[2]) | is.null(loc$x[1])) {
                 break
             }
             dlay=rbind(lay,c(loc$x[1],loc$y[1]))

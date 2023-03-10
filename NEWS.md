@@ -1,4 +1,4 @@
-## Version 0.1
+## Version 0.1.0
 
 - 2023-03-03: Initial version on Github only.
 
@@ -12,6 +12,11 @@ Methods:
     - `snha_ll`
     - `snha_rsquare`
 
-## Version 0.2
+## Version 0.1.1
 
-Work in progress ...
+- 2023-03-10: Submission to CRAN
+
+    - bugfixes requested by rhub build
+    - doi id fixes
+    - typo fixes
+    - removing class checks for null based on strings
