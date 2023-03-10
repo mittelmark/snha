@@ -3,7 +3,10 @@
 \title{log-likelihood for the given snha graph and the given chain} 
 \usage{snha_ll(graph,chain=NULL)} 
 \description{This function returns the log-likelihood for the given snha 
-graph and the given chain.} 
+graph and the given chain. If the 'block.p.value' is lower than 0.05 than 
+that the chain is not sufficient to capture the variable dependencies, 
+p-values above 0.05 indicate a good coverage of the chain for the linear 
+dependencies between the nodes.} 
 \arguments{ 
 \item{graph}{a snha graph object} 
 \item{chain}{a chain object of a snha graph, if not given a data frame with 

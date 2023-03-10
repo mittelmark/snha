@@ -7,8 +7,7 @@ constructs the graph as a matrix.}
 \arguments{ 
 \item{graph}{a snha graph object} 
 } 
-\value{matrix with one chain per row, shorter chains are filled up with 
-empty strings} 
+\value{matrix with one chain per row, shorter chains are filled up with empty strings} 
 \examples{ 
 data(swiss) 
 sw.g=snha(swiss) 

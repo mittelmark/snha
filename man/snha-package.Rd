@@ -30,6 +30,7 @@ Utility functions:
         or adjacency matrix calculate linear model r-square value} 
 } 
 } 
+\value{No return value}  
 \examples{ 
 library(MASS) 
 data(birthwt) 

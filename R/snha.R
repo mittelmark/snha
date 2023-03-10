@@ -102,9 +102,16 @@
 #' }
 #' \keyword{network}
 #' \keyword{correlation}
-#' \value{A snha graph data object with the fields 'theta' for the adjacency
-#'       matrix, 'sigma' for the correlation matrix, 'chains' for the association chains
-#'       and 'data' representing the original input data.}
+#' \value{A snha graph data object with the folling components:
+#' \describe{
+#' \item{chains}{association chains building the graph}
+#' \item{data}{representing the original input data}
+#' \item{p.values}{matrix with p-values for the pairwise correlations}
+#' \item{probabilities}{in case of re-samplings, the proportion how often the chain was found}
+#' \item{sigma}{correlation matrix used for the algorithm}
+#' \item{theta}{adjacency  matrix found by the SNHA method}
+#' }
+#' }
 #' \examples{
 #' data(swiss)
 #' sw.g=snha(swiss,method='spearman')
@@ -230,7 +237,10 @@ snha_get_chains <- function (graph) {
 #' \title{log-likelihood for the given snha graph and the given chain}
 #' \usage{snha_ll(graph,chain=NULL)}
 #' \description{This function returns the log-likelihood for the given snha
-#' graph and the given chain.}
+#' graph and the given chain. If the 'block.p.value' is lower than 0.05 than
+#' that the chain is not sufficient to capture the variable dependencies,
+#' p-values above 0.05 indicate a good coverage of the chain for the linear
+#' dependencies between the nodes.}
 #' \arguments{
 #' \item{graph}{a snha graph object}
 #' \item{chain}{a chain object of a snha graph, if not given a data frame with

@@ -36,9 +36,16 @@
 } 
 \keyword{network} 
 \keyword{correlation} 
-\value{A snha graph data object with the fields 'theta' for the adjacency 
-      matrix, 'sigma' for the correlation matrix, 'chains' for the association chains 
-      and 'data' representing the original input data.} 
+\value{A snha graph data object with the folling components: 
+\describe{ 
+\item{chains}{association chains building the graph} 
+\item{data}{representing the original input data} 
+\item{p.values}{matrix with p-values for the pairwise correlations} 
+\item{probabilities}{in case of re-samplings, the proportion how often the chain was found} 
+\item{sigma}{correlation matrix used for the algorithm} 
+\item{theta}{adjacency  matrix found by the SNHA method} 
+} 
+} 
 \examples{ 
 data(swiss) 
 sw.g=snha(swiss,method='spearman') 
