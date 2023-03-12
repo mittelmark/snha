@@ -50,11 +50,12 @@ To cite package ‘snha’ in publications use:
 ## Example
 
 The package has a function `snha` where you give your data as input. The
-function then results than an object of class `snha` which you can plot and
+function creates an object of class `snha` which you can plot and
 explore easily. Here an example just using the `swiss` data which are part of
 every R installation:
 
 ```r
+> library(snha)
 > library(MASS)
 > data(swiss)
 > colnames(swiss)=abbreviate(swiss)
