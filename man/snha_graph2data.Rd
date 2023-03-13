@@ -30,7 +30,7 @@ simulation or 'pc' for using a precision matrix, default: 'mc'}
 } 
 \value{matrix with the node names as rows and samplings in the columns} 
 \examples{ 
-par(mfrow=c(1,2),mai=rep(0.2,4)) 
+opar=par(mfrow=c(1,2),mai=rep(0.2,4)) 
 A=matrix(0,nrow=6,ncol=6) 
 rownames(A)=colnames(A)=LETTERS[1:6] 
 A[1:2,3]=1 
@@ -42,6 +42,7 @@ data=snha_graph2data(A)
 round(cor(t(data)),2) 
 P=snha(t(data)) 
 plot(P,layout="circle") 
+par(opar) 
 } 
 \references{ 
 \itemize{ 

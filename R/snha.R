@@ -183,12 +183,10 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
             for (i in idx) {
                 if (max(cmt[i,])>threshold) {
                     j=which(max(cmt[i,])==cmt[i,])
-                    options(warn=-1)
                     if (cor.test(data[,i],data[,j])$p.value<alpha) {
                         as$theta[i,j]=0.5
                         as$theta[j,i]=0.5
                     }
-                    options(warn=0)
                 }
             }
         }
@@ -378,7 +376,7 @@ snha_rsquare = function (data,graph=NULL) {
 #' }
 #' \value{matrix with the node names as rows and samplings in the columns}
 #'\examples{
-#' par(mfrow=c(1,2),mai=rep(0.2,4))
+#' opar=par(mfrow=c(1,2),mai=rep(0.2,4))
 #' A=matrix(0,nrow=6,ncol=6)
 #' rownames(A)=colnames(A)=LETTERS[1:6]
 #' A[1:2,3]=1
@@ -390,6 +388,7 @@ snha_rsquare = function (data,graph=NULL) {
 #' round(cor(t(data)),2)
 #' P=snha(t(data))
 #' plot(P,layout="circle")
+#' par(opar)
 #' }
 #' \references{
 #' \itemize{

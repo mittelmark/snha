@@ -69,7 +69,7 @@ as the algorithm is very resistant against the detection of spurious
 correlations.
 
 ```{r label=plotsnha, fig.width=10,fig.height=5,fig.cap="Birth weight data variable interactions"}
-par(mfrow=c(1,2),mai=c(0.8,0.8,0.1,0.2))
+opar=par(mfrow=c(1,2),mai=c(0.8,0.8,0.1,0.2))
 library(snha)
 # retrieve some data
 pca=prcomp(t(scale(birthwt)))
@@ -82,6 +82,7 @@ par(mai=c(0.8,0.2,0.1,0.2))
 plot(as,layout="sam",vertex.size=7,lwd=3,edge.width=3)
 text(-1.5,-1.8,"SNHA",cex=2)
 box()
+par(opar)
 ```
 
 In the PCA plot on the left, the most import variables, having high values in
@@ -175,14 +176,15 @@ head(swiss,4)
 ### shorter names useful for display later in the graph
 colnames(swiss)=abbreviate(colnames(swiss))
 head(swiss,4)
-par(mfrow=c(1,2))
-options(warn=-1)
+opar=par(mfrow=c(1,2))
+### options(warn=-1)
 as=snha(swiss,method="pearson")
 ### store layout for reuse in two graphs
 lay = snha_layout(as,mode="sam")
 plot(as,layout=lay,vertex.size=8,main="Pearson")
 as=snha(swiss,method="spearman")
 plot(as,layout=lay,vertex.size=8,main="Spearman")
+par(opar)
 ```
 
 Here is the resulting adjacency matrix:
@@ -223,10 +225,11 @@ values on the edges of the graph. Here an example where we do first
 a correlation plot and then a plot of the SNHA graph overlaying the edges with the correlation values.
 
 ```{r label=corrplot,fig.width=10,fig.height=5,fig.cap="Correlation and Network plot with correlation values on the edges"}
-par(mfrow=c(1,2),mai=rep(0.2,4))
+opar=par(mfrow=c(1,2),mai=rep(0.2,4))
 sw=snha(swiss,method="spearman",alpha=0.1)
 plot(sw,type="corrplot")
 plot(as,edge.text=round(as$sigma,2),edge.pch=15,layout='sam')
+par(opar)
 ```
 
 ## Log-Likelihood
@@ -273,11 +276,12 @@ rarely are less likely to be of importance and significance.
 Let's use an example:
 
 ```{r label=boot,fig.width=9,fig.height=4,fig.cap="Boostrap Example"}
-par(mfrow=c(1,2),mai=c(0.1,0.1,0.7,0.1))
+opar=par(mfrow=c(1,2),mai=c(0.1,0.1,0.7,0.1))
 as.boot=snha(swiss,method="spearman",prob=TRUE)
 lay=snha_layout(as.boot,method="sam")
 plot(as,layout=lay,vertex.size=6,main="Single Run")
 plot(as.boot,layout=lay,vertex.size=6,main="Bootstrap Run")
+par(opar)
 ```
 
 Solid lines shown in the graph above indicate that edges where found in more
@@ -319,10 +323,11 @@ As you can see the correlations follow the given graph, we can as well plot
 these for better illustration:
 
 ```{r label=wplot,fig.width=8,fig.height=3,out.width=900,fig.cap="True graph, correlations and predicted graph (left to right)"}
-par(mfrow=c(1,3),mai=rep(0.2,4))
+opar=par(mfrow=c(1,3),mai=rep(0.2,4))
 plot.snha(W)
 plot.snha(cor(t(data)),type="cor")
 plot.snha(snha(t(data)))
+par(opar)
 ```
 
 
@@ -391,11 +396,12 @@ influencing a variable _B_, _B_ is influencing a variable _C_ and _C_ is influen
 variable _D_ like this: 
 
 ```{r label=start,fig.width=6,fig.height=1.7,fig.cap="An association chain"}
-par(mai=c(0.1,0.1,0.1,0.0))
+opar=par(mai=c(0.1,0.1,0.1,0.0))
 plot(1,xlab="",ylab="",axes=FALSE,type="n",xlim=c(0.5,4.5),ylim=c(0.8,1.2))
 arrows(1:3,rep(1,3),1:3+0.8,rep(1,3),lwd=3,length=0.1)
 points(1:4,rep(1,4),pch=19,col="salmon",cex=6)
 text(1:4,1,LETTERS[1:4],cex=2)
+par(opar)
 ```
 
 In this situation we can assume that, despite of the omnipresent noise in such
@@ -422,7 +428,7 @@ using the plot function of the `snha` package.
 
 ```{r label=corplot,fig.width=6,fig.height=3,fig.cap="Visualization of correlation matrix sigma and the adjacency matrix theta"}
 set.seed(123)
-par(mfrow=c(1,2),mai=c(0.1,0.1,0.1,0.1))
+opar=par(mfrow=c(1,2),mai=c(0.1,0.1,0.1,0.1))
 C=C+rnorm(length(C),mean=0,sd=0.1)
 C[lower.tri(C)]=t(C)[lower.tri(C)]
 diag(C)=1
@@ -431,6 +437,7 @@ round(as$sigma,3)
 plot(as,type="corplot")
 as$theta
 plot(as)
+par(opar)
 ```
 
 As we can see, the correlations are now slightly altered. A simple

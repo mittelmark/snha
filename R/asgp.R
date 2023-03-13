@@ -123,14 +123,11 @@ Asgp$data2chainGraph = function (data,method='pearson',
         }
         
     } else {
-        options(warn=-1)
         cormt=cor(data,method=method,use='pairwise.complete.obs')
         if (method == "kendall") {
             square=TRUE
             cormt=cormt
         }
-        options(warn=0)
-        #cormt[is.na(cormt)]=0
         cor.p.value=self$corTest(data,method=method,p.adjust=p.adjust)$p.value 
     }
     # if all pairs are NA
@@ -163,7 +160,6 @@ Asgp$data2chainGraph = function (data,method='pearson',
 
 Asgp$corTest = function (data,method='pearson',p.adjust='none') {
     self=Asgp
-    options(warn=-1)
         
     cor.p.values <- function(r, n) {
         df <- n - 2
@@ -210,7 +206,6 @@ Asgp$corTest = function (data,method='pearson',p.adjust='none') {
             }
         }
     }
-    options(warn=0)
     rownames(p.value)=colnames(p.value)=colnames(data)
     if (p.adjust != "none") {
         p.adj=p.adjust(p.value[upper.tri(p.value)],method=p.adjust)
