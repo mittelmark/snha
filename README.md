@@ -88,7 +88,7 @@ In.M    1    0    0    0    0    0
 
 ```
 
-![](img/swiss-spearman.png)
+![](https://raw.githubusercontent.com/mittelmark/snha/main/img/swiss-spearman.png)
 
 The theta object contains the adjacency matrix with the edges for the found
 graph. For more details consult the package vignette:
