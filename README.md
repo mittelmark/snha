@@ -19,6 +19,14 @@ For an implementation of the algorithm in Python look here
 
 ## Installation
 
+Either install the package directly from CRAN as usually:
+
+```
+install.packages('snha')
+```
+
+Or to use the latest version from the Github repository install it like this:
+
 ```
 library(remotes)
 remotes::install_github("https://github.com/mittelmark/snha")
@@ -42,7 +50,7 @@ To cite package 'snha' in publications use:
 To cite package ‘snha’ in publications use:
 
   Detlef Groth, University of Potsdam (2023). snha: St.
-  Nicolas House Algorithm for R. R package version 0.1.
+  Nicolas House Algorithm for R. R package version 0.1.3
 
 ...
 ```
