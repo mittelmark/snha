@@ -55,6 +55,9 @@ To cite package ‘snha’ in publications use:
 ...
 ```
 
+As there are currently no differences between the CRAN and the Github repository
+the CRAN install is the recommended way.
+
 ## Example
 
 The package has a function `snha` where you give your data as input. The
