@@ -43,11 +43,10 @@ bibentry(bibtype="Article",
 health",
     volume="18(4)",
     pages="1741",
+    doi="10.3390/ijerph18041741",
     textVersion=paste("Hermanussen, M., Aßmann, C., & Groth, D. (2021).",
     "Chain Reversion for Detecting Associations in Interacting Variables — 
      St. Nicolas House Analysis.",
     "International journal of environmental research and public health, 18(4),
-1741.",
-    doi="10.3390/ijerph18041741")
-
+1741.")
 )
