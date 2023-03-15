@@ -46,14 +46,14 @@ a random data vector as well:
 
 ```{r label=ddataprep}
 set.seed(125)
-# retrieve the data
+### retrieve the data
 library(MASS)
 data(birthwt)
 birthwt$low=NULL 
-# remove column for the low indicator 
-# which is 1 i a child has low birtwt
+### remove column for the low indicator 
+### which is 1 i a child has low birtwt
 rnd=round(rnorm(nrow(birthwt),mean=10,sd=2),2)
-# rnd just contains random data
+### rnd just contains random data
 birthwt=cbind(birthwt,rnd=rnd) # adding it
 head(birthwt)
 ```
@@ -71,7 +71,7 @@ correlations.
 ```{r label=plotsnha, fig.width=10,fig.height=5,fig.cap="Birth weight data variable interactions"}
 opar=par(mfrow=c(1,2),mai=c(0.8,0.8,0.1,0.2))
 library(snha)
-# retrieve some data
+### retrieve some data
 pca=prcomp(t(scale(birthwt)))
 summary(pca)
 plot(pca$x[,1:2],xlab='PC1', ylab='PC2',pch=19,cex=5,col='salmon')
