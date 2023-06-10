@@ -1,6 +1,6 @@
-VERSION := 0.1.3
+VERSION := 0.2.0
 PKG     := $(shell basename `pwd`)
-build: man/snha.Rd
+build: man/snha.Rd man/mgraph.Rd
 	R CMD build .
 
 check: build
