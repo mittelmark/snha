@@ -1,7 +1,7 @@
 Package: snha
 Type: Package
 Title: Creating Correlation Networks using St. Nicolas House Analysis
-Version: 0.1.3
+Version: 0.2.0
 Date: 2023-05-13
 Authors@R: c(person("Detlef","Groth", role=c("aut", "cre"),
                      email = "dgroth@uni-potsdam.de",
@@ -30,3 +30,4 @@ Collate:
     asgp.R
     priv.R
     snha.R
+    mgraph.R
