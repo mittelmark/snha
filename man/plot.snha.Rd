@@ -1,6 +1,7 @@
 \name{plot.snha} 
  
 \alias{plot.snha} 
+\alias{plot.mgraph} 
 \title{display network or correlation matrices of snha graphs} 
 \description{The function `plot.snha` provides a simple display of network  
   graphs correlation matrices using  filled circles (vertices) to represent 
