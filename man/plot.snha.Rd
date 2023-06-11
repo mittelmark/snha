@@ -4,7 +4,7 @@
 \alias{plot.mgraph} 
 \title{display network or correlation matrices of snha graphs} 
 \description{The function `plot.snha` provides a simple display of network  
-  graphs correlation matrices using  filled circles (vertices) to represent 
+  graphs or correlation matrices using  filled circles (vertices) to represent 
   variables and edges which connect the vertices with high absolute.  
   correlation values. Positive correlations are shown in black, negative 
   correlations are shown in red. For more information see the details 
