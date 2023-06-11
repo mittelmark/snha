@@ -391,7 +391,7 @@ mgraph_u2d <- function (g,input=2,negative=0.0,shuffle=FALSE) {
         if (class(input)=='numeric') {
             nodes=c()
             
-            comps=Mgraph_components(A)
+            comps=Components(A)
             if (max(comps)>1) {
                 for (i in 1:max(comps)) {
                     if (length(which(comps==i)) > 1) {
@@ -442,60 +442,3 @@ mgraph_u2d <- function (g,input=2,negative=0.0,shuffle=FALSE) {
 }
 
 
-Mgraph_components <- function (g) {
-    A=g
-    A=as.matrix(A)
-    A=A+t(A)
-    A[A>0]=1
-    comp=c()
-    P=Mgraph_shortest.paths(A)
-    nodes=rownames(A)
-    x=1
-    while (length(nodes) > 0) {
-        n=nodes[1]
-        idx=which(P[n,] < Inf)
-        ncomp=rep(x,length(idx))
-        names(ncomp)=rownames(P)[idx]
-        comp=c(comp,ncomp)
-        nodes=setdiff(nodes,rownames(P)[idx])
-        x=x+1
-    }
-    return(comp[rownames(A)])
-}
-
-Mgraph_shortest.paths <- function (g,mode="directed") {
-    A=g
-    if (mode == "undirected") {
-        A=A+t(A)
-        A[A!=0]=1
-    }
-    S=A
-    S[]=Inf
-    diag(S)=0
-    x=1
-    S[A > 0 & A < Inf]=1
-    while (TRUE) { 
-        flag = FALSE 
-        for (m in 1:nrow(S)) {
-            ns=which(S[m,] == x)
-            for (n in ns) {
-                for (o in which(A[n,]==1)) {
-                    if (o != m) {
-                        flag = TRUE
-                        if (S[m,o] > x + 1) {
-                            S[m,o]=x+1
-                            if (mode == "undirected") {
-                                S[o,m]=x+1
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (!flag) {
-            break
-        }
-        x=x+1
-    }
-    return(S)
-}

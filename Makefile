@@ -8,3 +8,6 @@ check: build
 
 man/%.Rd: R/%.R
 	Rscript bin/rman.R $<
+
+install: check
+	R CMD INSTALL $(PKG)_$(VERSION).tar.gz

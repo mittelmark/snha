@@ -445,9 +445,10 @@ snha_graph2data <- function (A,n=100,iter=50,val=100,sd=2,prop=0.025,noise=1,met
 #' \name{plot.snha}
 #'
 #' \alias{plot.snha}
+#' \alias{plot.mgraph}
 #' \title{display network or correlation matrices of snha graphs}
 #' \description{The function `plot.snha` provides a simple display of network 
-#'   graphs correlation matrices using  filled circles (vertices) to represent
+#'   graphs or correlation matrices using  filled circles (vertices) to represent
 #'   variables and edges which connect the vertices with high absolute. 
 #'   correlation values. Positive correlations are shown in black, negative
 #'   correlations are shown in red. For more information see the details
@@ -585,10 +586,10 @@ plot.snha = function (x,type='network',
     }
 
     if (type %in% c('corrplot','cor','corplot')) {
-        if (is.data.frame(g)) {
-            Snha_corrplot(g,text.lower=TRUE,cex=cex,...)
+        if (is.data.frame(g)  | is.matrix(g)) {
+            snha_corrplot(g,text.lower=TRUE,cex=cex,...)
         } else {
-            Snha_corrplot(g$sigma,text.lower=TRUE,cex=cex,...)
+            snha_corrplot(g$sigma,text.lower=TRUE,cex=cex,...)
         }
         lay=NULL
     } else {
@@ -964,5 +965,117 @@ snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center
         return(xy)
     } else {
         return(xy)
+    }
+}
+#' \name{snha_corrplot}
+#' \alias{snha_corrplot}
+#' \title{visualize a matrix of pairwise correlations}
+#' \usage{snha_corrplot(
+#'    x,
+#'    text.lower=FALSE,
+#'    text.upper=FALSE,
+#'    pch.minus=19,
+#'    pch.plus=19,
+#'    xtext=NULL,
+#'    cex=1.0,
+#'    ...)
+#' }
+#' \description{This function returns xy coordinates for a given input
+#'       adjacency matrix or snha graph. It is useful if you like to plot
+#'       the same set of nodes with different edge connections 
+#'       in the same layout.}
+#' \arguments{
+#'  \item{x}{matrix with pairwise correlations}
+#'  \item{text.lower}{should in the lower diagonal the correlation coefficient be shown, default: TRUE}
+#'  \item{text.upper}{should in the upper diagonal the correlation coefficient be shown, default: FALSE}
+#'  \item{pch.minus}{the plotting symbol for negative correlations, default: 19}
+#'  \item{pch.plus}{the plotting symbol for positive correlations, default: 19}
+#  ##  \item{p.mat}{matrix with p-values to strike out insignificant p-values, default: NULL (not used)}
+#  ## \item{alpha}{significance threshold for `p.mat`, default: 0.05}
+#'  \item{cex}{character expansion for text and correlation symbols, default: 1}
+#'  \item{\ldots}{arguments delegated to the plot function}
+#' }
+#' \examples{
+#' data(swiss)
+#' sw=swiss
+#' colnames(sw)=abbreviate(colnames(swiss),6)
+#' options(warn=-1) # avoid spearman warnings
+#' snha_corrplot(cor(sw,method="spearman"),cex.sym=8,text.lower=TRUE)
+#' options(warn=0)
+#' }
+#' 
+
+snha_corrplot = function (x,
+                          text.lower=FALSE,
+                          text.upper=FALSE,
+                          pch.minus=19,
+                          pch.plus=19,
+                          xtext=NULL,
+                          cex=1.0,
+                          ...) {
+    mt=x
+    ymax=nrow(mt)+0.5
+    if (length(xtext)>1){
+        ymax=ymax+1
+    } 
+    plot(1,type="n",xlab="",ylab="",axes=FALSE,
+         xlim=c(-0.5,ncol(mt)+0.5),ylim=c(ymax,0),...)
+    cscale=cex
+    cex=0.9*(10/nrow(mt))
+    if (cex>0.9) {
+        cex=1
+    }
+    cex=cscale*cex
+    # change
+    text(1:ncol(mt),0.25,colnames(mt),cex=cex)
+    if (length(xtext)>0) {
+        if (!is.null(names(xtext)[1])) {
+            text(1:ncol(mt),nrow(mt)+0.75,names(xtext),cex=cex)
+            text(1:ncol(mt),nrow(mt)+1.25,xtext,cex=cex)
+        } else {
+            text(1:ncol(mt),nrow(mt)+0.75,xtext,cex=cex)
+        }
+    }
+    # change
+    text(0,1:nrow(mt),rownames(mt),cex=cex)
+    cols=paste("#DD3333",rev(c(15,30, 45, 60, 75, 90, "AA","BB","CC","DD")),sep="")
+    cols=c(cols,paste("#3333DD",c(15,30, 45, 60, 75, 90, "AA","BB","CC","DD"),sep=""))
+    breaks=seq(-1,1,by=0.1)                  
+    sym=identical(rownames(mt),colnames(mt))
+    cex=5*(10/nrow(mt))
+    if (cex>5) {
+        cex=5
+    }
+    cex=cscale*cex
+    for (i in 1:nrow(mt)) {
+        for (j in 1:nrow(mt)) {
+            if (sym & i == j) {
+                next
+            }   
+            #cex=abs(mt[i,j])*2
+            coli=cut(mt[i,j],breaks=breaks,labels=1:20)
+            pch=19
+            if (is.na(mt[i,j])) {
+                pch=NA
+            } else if (mt[i,j]< 0) {
+                pch=pch.minus
+            } else {
+                pch=pch.plus
+            }
+            if (i == j & !sym & text.lower) {
+                text(i,j,sprintf("%.2f",mt[i,j]),cex=(cex/5.5))
+            } else if (i < j & text.lower) {
+                text(i,j,round(mt[i,j],2),cex=(cex/5.5))
+            } else if (i > j & text.upper) {
+                text(i,j,round(mt[i,j],2),cex=(cex/5.5))
+            } else {
+                if (pch==17) {
+                    points(i,j,pch=pch,cex=cex*0.7*cscale,col=cols[coli])
+                } else {
+                    points(i,j,pch=pch,cex=cex*0.7*cscale,col=cols[coli])
+                }
+            }
+
+        }
     }
 }

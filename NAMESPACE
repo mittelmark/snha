@@ -1,6 +1,7 @@
 exportPattern("^[[:lower:]]+")
 S3method(as.list,snha)
 S3method(plot,snha)
+S3method(plot,mgraph)
 importFrom("stats", "cor", "cor.test","as.dist","dist","rnorm","cmdscale",
   'lm','reformulate')
 importFrom("graphics", "arrows", "axTicks", "lines", "locator",
