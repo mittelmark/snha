@@ -21,8 +21,7 @@
  \item{text.upper}{should in the upper diagonal the correlation coefficient be shown, default: FALSE} 
  \item{pch.minus}{the plotting symbol for negative correlations, default: 19} 
  \item{pch.plus}{the plotting symbol for positive correlations, default: 19} 
-#  ##  \item{p.mat}{matrix with p-values to strike out insignificant p-values, default: NULL (not used)} 
-#  ## \item{alpha}{significance threshold for `p.mat`, default: 0.05} 
+ \item{xtext}{labels which should be placed at the bottom of the plot,  default: NULL} 
  \item{cex}{character expansion for text and correlation symbols, default: 1} 
  \item{\ldots}{arguments delegated to the plot function} 
 } 

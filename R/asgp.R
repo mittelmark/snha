@@ -108,7 +108,7 @@ Asgp$data2chainGraph = function (data,method='pearson',
                                 threshold=0.01,maxl=3,top=10,
                                 p.adjust='none',
                                 alpha=0.01,
-                                cor.p.value=NULL) {
+                                cor.p.value=NULL, nd=FALSE) {
     self=Asgp
     if (nrow(data)==ncol(data) &&  
         length(which(colnames(data)==rownames(data))) == nrow(data)) {
@@ -133,6 +133,11 @@ Asgp$data2chainGraph = function (data,method='pearson',
     # if all pairs are NA
     cor.p.value[is.na(cormt)]=1
     cormt[is.na(cormt)]=0
+    if (nd) {
+        print("nd performing")
+        cormt=mgraph_nd(cormt,beta=0.8,alpha=0.8)
+        diag(cormt)=1
+    }
     chains=self$getChains(cormt,square=square,threshold=threshold,
                           maxl=maxl,top=top)
     edgelist=self$chains2edgelists(chains)

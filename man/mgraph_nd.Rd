@@ -20,6 +20,14 @@ data=snha_graph2data(W)
 C=cor(t(data)) 
 round(C,2) 
 round(mgraph_nd(C,beta=0.9,alpha=0.3),2) 
+# manually prepare the deconvoluted matrix 
+D=mgraph_nd(C,beta=0.9,alpha=0.3) 
+diag(D)=1 
+par(mfrow=c(2,2)) 
+plot(W) 
+plot(snha(t(data))) 
+plot(snha(t(data),nd=TRUE)) 
+plot(snha(D)) 
 } 
 \references{ 
 \itemize{ 

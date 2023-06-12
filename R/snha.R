@@ -69,7 +69,8 @@
 #' \title{Initialize a snha object with data.}
 #' \description{
 #'     The main entry function to initialize a snha object with data where
-#'     variables are in columns and items are in rows
+#'     variables are in columns and items are in rows. If you like to use the network
+#'     deconvolution method of Feizi et al. instead of the data submit the deconvoluted matrix.
 #' }
 #' \usage{snha(
 #'   data,
@@ -79,7 +80,8 @@
 #'   check.singles=FALSE,
 #'   prob=FALSE,
 #'   prob.threshold=0.2,
-#'   prob.n=25)
+#'   prob.n=25,
+#'   nd=FALSE)
 #' }
 #' \arguments{
 #' \item{data}{a data frame where network nodes are the row names and data
@@ -99,6 +101,7 @@
 #' \item{prob.threshold}{threshold to set an edge, a value of 0.5 means, that
 #'          the edge must be found in 50\% of all samplings, default: 0.2}
 #' \item{prob.n}{number of bootstrap samples to be taken, default: 25}
+#' \item{nd}{perfom network deconvolution due to the method of Feizi et. al. 2013, default: FALSE}
 #' }
 #' \keyword{network}
 #' \keyword{correlation}
@@ -129,7 +132,7 @@
 
 snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
                      check.singles=FALSE,
-                     prob=FALSE,prob.threshold=0.2,prob.n=25) {
+                     prob=FALSE,prob.threshold=0.2,prob.n=25,nd=FALSE) {
     if (prob) {
         # check for correlation matrix
         if (nrow(data)==ncol(data) &  
@@ -138,13 +141,13 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
         }
 
         as=snha(data,alpha=alpha,method=method,threshold=threshold,
-                   check.singles=check.singles,prob=FALSE)
+                   check.singles=check.singles,prob=FALSE,nd=nd)
         rand.prob=as$theta
         rand.prob[]=0
         for (i in 1:prob.n) {
             sam=sample(1:nrow(data),nrow(data),replace=TRUE)
             asi=snha(data[sam,],alpha=alpha,method=method,threshold=threshold,
-                        check.singles=check.singles,prob=FALSE)
+                        check.singles=check.singles,prob=FALSE,nd=nd)
             if (i == 1) {
                 as$probabilities=asi$theta
             } else {
@@ -156,7 +159,7 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
                 rand.data[,i]=sample(data[,i])
             }
             asr=snha(rand.data,alpha=alpha,method=method,threshold=threshold,
-                        check.singles=check.singles,prob=FALSE)
+                        check.singles=check.singles,prob=FALSE,nd=nd)
             rand.prob=rand.prob+asr$theta
         }
         as$probabilities=as$probabilities/prob.n
@@ -169,7 +172,7 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
         vprob=as.vector(as$probabilities)
         as$p.values[]=unlist(lapply(vprob,function (x) 1-length(which(x>rand.prob))/length(rand.prob)))
     } else {
-        as=Asgp$data2chainGraph(data,alpha=alpha,method=method,threshold=threshold)
+        as=Asgp$data2chainGraph(data,alpha=alpha,method=method,threshold=threshold,nd=nd)
         if (check.singles) {
             cmt=as$sigma
             #cor(data,method=method,use='pairwise.complete.obs')
@@ -990,8 +993,7 @@ snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center
 #'  \item{text.upper}{should in the upper diagonal the correlation coefficient be shown, default: FALSE}
 #'  \item{pch.minus}{the plotting symbol for negative correlations, default: 19}
 #'  \item{pch.plus}{the plotting symbol for positive correlations, default: 19}
-#  ##  \item{p.mat}{matrix with p-values to strike out insignificant p-values, default: NULL (not used)}
-#  ## \item{alpha}{significance threshold for `p.mat`, default: 0.05}
+#'  \item{xtext}{labels which should be placed at the bottom of the plot,  default: NULL}
 #'  \item{cex}{character expansion for text and correlation symbols, default: 1}
 #'  \item{\ldots}{arguments delegated to the plot function}
 #' }
@@ -1004,6 +1006,10 @@ snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center
 #' options(warn=0)
 #' }
 #' 
+
+## Add later:
+##  \item{p.mat}{matrix with p-values to strike out insignificant p-values, default: NULL (not used)}
+## \item{alpha}{significance threshold for `p.mat`, default: 0.05}
 
 snha_corrplot = function (x,
                           text.lower=FALSE,

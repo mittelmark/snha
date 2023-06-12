@@ -442,3 +442,133 @@ mgraph_u2d <- function (g,input=2,negative=0.0,shuffle=FALSE) {
 }
 
 
+#' \name{mgraph_accuracy}
+#' \alias{mgraph_accuracy}
+#' \title{quality measures for a predicted graph}
+#' \description{
+#'    The function `mgraph_accuracy` measures the prediction
+#'    quality of a predicted graph in comparison to a known true one.
+#'    The graph comparisons are done on the basis of undirected graphs only.
+#'    Directed graphs are converted to undirected internally.
+#' }
+#' \usage{mgraph_accuracy(g.true,g.pred)}
+#' \arguments{
+#' \item{g.true}{snha, mgraph or or adjacency matrix of a the true graph}
+#' \item{g.pred}{snha, mgraph or or adjacency matrix of a the predicted graph}
+#' }
+#' \value{returns list object with various accuracy measures, such as Sens(itivity), Spec(ificity), Acc(uracy), balanced classification rate (BCR), F1 measure and Mathhews correlaition coefficient (MCC)}
+#' \examples{
+#' ang=mgraph(type="angie",nodes=12,edges=18)
+#' data=snha_graph2data(ang)
+#' pred=snha(t(data))$theta
+#' round(unlist(mgraph_accuracy(ang,pred)),2)
+#' #  using vectors
+#' tvec=c(1,1,1,0,0,0)
+#' pvec=c(1,1,0,1,0,0)
+#' table(tvec,pvec)
+#' mgraph_accuracy(tvec,pvec)
+#' }
+#' 
+
+mgraph_accuracy <- function (g.true,g.pred) {
+    # Convert to undirected
+    if (!is.vector(g.true)) {
+        g.true <- mgraph_d2u(g.true)
+        g.pred <- mgraph_d2u(g.pred)
+        g.true <- g.true[upper.tri(g.true)]
+        g.pred <- g.pred[upper.tri(g.pred)]
+    }
+    # Convert explictly to 'double' to avoid integer overflow
+    TP=as.double(length(which(g.true != 0 & g.pred != 0)))
+    FP=as.double(length(which(g.true == 0 & g.pred != 0)))
+    TN=as.double(length(which(g.true == 0 & g.pred == 0)))
+    FN=as.double(length(which(g.true != 0 & g.pred == 0)))
+    # Included NA check
+    Acc=if ( (TP+TN+FP+FN) != 0 ) { TP+TN/(TP+TN+FP+FN) } else { NaN }
+    Sens=if ( (TP+FN) != 0 ) { TP/(TP+FN) } else { NaN }
+    Spec=if ( (TN+FP) != 0 ) { TN/(TN+FP) } else { NaN }
+    BCR=(Sens+Spec)/2
+    F1=if ( (2*TP+FP+FN) != 0 ) { 2*TP/(2*TP+FP+FN) } else { NaN }
+    MCC=if ( sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)) != 0) { (TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)) } else { NaN }
+    norm_MCC=(MCC+1)/2
+    return(list(TP=TP,FP=FP,TN=TN,FN=FN,Sens=Sens,Spec=Spec, BCR=BCR,F1=F1,MCC=MCC, norm_MCC=norm_MCC))
+}
+
+#' \name{mgraph_nd}
+#' \alias{mgraph_nd}
+#' \title{network deconvolved data matrix using the algorithm of Feizi et. al. 2013}
+#' \description{
+#'    This function is a R implementation for "A General Method to Distinguish Direct Dependencies over Networks" by Feizi et. al (2013). For the Matlab code look here:
+#'   \url{http://compbio.mit.edu/nd/code/ND.m}
+#' }
+#' \usage{mgraph_nd(x,beta=0.99,alpha=1,control=FALSE)}
+#' \arguments{
+#' \item{x}{symmetric relevance matrix, where high similarity between nodes is expressed with high values such as in an correlation matrix}
+#' \item{beta}{scaling paramater, the largest absolute eigenvalue is mapped to beta, values should be between 0 and 1, default: 0.99}
+#' \item{alpha}{fraction of edges of the observed dependency matrix to be kept, should be between 0 (none) and 1 (all), default: 1}
+#' \item{control}{if FALSE only direct weights are displayed, if TRUE also non-observed interactions are displayed, default: FALSE}
+#' }
+#' \value{returns matrix with deconvoluted relevance matrix}
+#' \examples{
+#' W=mgraph(type="werner")
+#' W
+#' data=snha_graph2data(W)
+#' C=cor(t(data))
+#' round(C,2)
+#' round(mgraph_nd(C,beta=0.9,alpha=0.3),2)
+#' # manually prepare the deconvoluted matrix
+#' D=mgraph_nd(C,beta=0.9,alpha=0.3)
+#' diag(D)=1
+#' par(mfrow=c(2,2))
+#' plot(W)
+#' plot(snha(t(data)))
+#' plot(snha(t(data),nd=TRUE))
+#' plot(snha(D))
+#' }
+#' \references{
+#' \itemize{
+#' \item Feizi, S., Marbach, D., Medard, M., & Kellis, M. (2013). Network deconvolution as a general method to distinguish direct dependencies in networks.
+#'     Nature biotechnology, 31(8), 726-733. DOI 10.1038/nbt.2635
+#' }
+#' }
+#' \author{
+#' \itemize{
+#' \item @2013 KELLIS-LAB, Soheil Feizi, Matlab code
+#' \item @2021 Detlef Groth, University of Potsdam, R code
+#' }
+#' }
+#' 
+
+mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
+   n = ncol(x)
+   diag(x)=0
+   y=stats::quantile(x,1-alpha,type=5)
+   mat_th=x
+   mat_th[mat_th<y]=0
+   mat_th=(mat_th+t(mat_th))/2
+   E=eigen(mat_th)
+   lam_n=abs(min(E$values))
+   lam_p=abs(max(E$values))
+   m1=lam_p*(1-beta)/beta;
+   m2=lam_n*(1+beta)/beta;
+   m=max(m1,m2);
+   E$values=E$values/(m+E$values)
+   EV=matrix(0,nrow=n,ncol=n)
+   diag(EV)=E$values
+   mat_new1=E$vectors %*% EV %*% t(E$vectors)
+   if (!control) {
+       ind_edges = (mat_th>0)*1.0;
+       ind_nonedges = (mat_th==0)*1.0;
+       m1 = max(x * ind_nonedges); # yes * as checked by Octave Op: .* is like * in R
+       m2 = min(mat_new1);
+       mat_new2 = (mat_new1+max(m1-m2)) * ind_edges + (x * ind_nonedges);
+   } else {
+       m2=min(mat_new1)
+       mat_new2 = (mat_new1+max(-m2,0));
+   }
+   m1 = min(mat_new2);
+   m2 = max(mat_new2);
+   mat_nd = (mat_new2-m1) / (m2-m1);
+   rownames(mat_nd)=colnames(mat_nd)=colnames(x)
+   return(mat_nd)
+}

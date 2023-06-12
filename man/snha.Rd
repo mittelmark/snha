@@ -3,7 +3,8 @@
 \title{Initialize a snha object with data.} 
 \description{ 
     The main entry function to initialize a snha object with data where 
-    variables are in columns and items are in rows 
+    variables are in columns and items are in rows. If you like to use the network 
+    deconvolution method of Feizi et al. instead of the data submit the deconvoluted matrix. 
 } 
 \usage{snha( 
   data, 
@@ -13,7 +14,8 @@
   check.singles=FALSE, 
   prob=FALSE, 
   prob.threshold=0.2, 
-  prob.n=25) 
+  prob.n=25, 
+  nd=FALSE) 
 } 
 \arguments{ 
 \item{data}{a data frame where network nodes are the row names and data 
@@ -33,6 +35,7 @@
 \item{prob.threshold}{threshold to set an edge, a value of 0.5 means, that 
          the edge must be found in 50\% of all samplings, default: 0.2} 
 \item{prob.n}{number of bootstrap samples to be taken, default: 25} 
+\item{nd}{perfom network deconvolution due to the method of Feizi et. al. 2013, default: FALSE} 
 } 
 \keyword{network} 
 \keyword{correlation} 
