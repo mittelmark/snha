@@ -1,6 +1,6 @@
 \name{snha_get_chains} 
 \alias{snha_get_chains} 
-\title{Return the chains of an snha graph as data frame} 
+\title{Return the chains of a snha graph as data frame} 
 \usage{snha_get_chains(graph)} 
 \description{This is a utility function to return the chains which 
 constructs the graph as a matrix.} 

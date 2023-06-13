@@ -134,7 +134,6 @@ Asgp$data2chainGraph = function (data,method='pearson',
     cor.p.value[is.na(cormt)]=1
     cormt[is.na(cormt)]=0
     if (nd) {
-        print("nd performing")
         cormt=mgraph_nd(cormt,beta=0.8,alpha=0.8)
         diag(cormt)=1
     }

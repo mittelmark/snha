@@ -572,3 +572,103 @@ mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
    rownames(mat_nd)=colnames(mat_nd)=colnames(x)
    return(mat_nd)
 }
+
+#' \name{mgraph_lmc}
+#' \alias{mgraph_lmc}
+#' \title{using linear models to check the create snha graph}
+#' \description{
+#'    This function checks a given snha graph against its own data using linear
+#'    models. Edges are removed if they do not add  more than 2 percent of the 
+#'    adjusted  R-square value. The function might be only called directly if the user would like to
+#'    change the default values for del and add. 
+#'    The function snha uses defaults of 0.02 for del(eting) and 0.05 for add(ing) values.
+#' }
+#' \usage{mgraph_lmc(x,del=0.02,add=NULL)}
+#' \arguments{
+#' \item{x}{snha graph object}
+#' \item{del}{r-square threshold to delete edges, edges not adding more than this value to the linear model to the target node will be deleted, default: 0.02}
+#' }
+#' \value{returns adjacency matrix where edges migh be removed if they are not adding explanation to the model}
+#' \examples{
+#' set.seed(123)
+#' B=mgraph(type="barabasi",m=1)
+#' data=t(snha_graph2data(B))
+#' aa=snha(data)
+#' aa$theta
+#' unlist(mgraph_accuracy(B,aa$theta))
+#' ab=mgraph_lmc(aa)
+#' unlist(mgraph_accuracy(B,ab))
+#' ab
+#' aa$theta-ab
+#' unlist(mgraph_accuracy(B,aa$theta))
+#' unlist(mgraph_accuracy(B,ab))
+#' }
+#' 
+
+# linear model check for a snha graph object
+
+
+# \item{add}{r-square threshold to add edges, if NULL no edges will be added, recommended value is 0.05, default: NULL}
+
+mgraph_lmc <- function (x,del=0.02) {
+    g=x
+    lms <- function (x) {
+        L=matrix(0,nrow=ncol(x),ncol=ncol(x))
+        rownames(L)=colnames(L)=colnames(x)
+        cnames=colnames(x)
+        for (i in 1:ncol(x)) {
+            cn=setdiff(cnames,cnames[i])
+            while (length(cn)>1) {
+                frm=stats::formula(paste(cnames[i],"~",paste(cn,collapse="+")))
+                adjrs.all=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
+                min=1
+                min.cn=cn[1]
+                for (c in cn) {
+                    frm=stats::formula(paste(cnames[i],"~",paste(setdiff(cn,c),collapse="+")))
+                    adjrs.cn=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
+                    if (adjrs.all-adjrs.cn<min) {
+                        min=adjrs.all-adjrs.cn
+                        min.cn=c
+                    }   
+                }    
+                cn=setdiff(cn,min.cn)
+                L[cnames[i],min.cn]=min
+            }
+            frm=stats::formula(paste(cnames[i],"~",cn[1]))
+            L[cnames[i],cn[1]]=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
+        }
+        L[L<0]=0
+        return(L)
+    }
+    fixGraph <- function (A) {
+        C=A
+        A[upper.tri(A)]=A[upper.tri(A)]+t(A[lower.tri(A)])
+        A[A>1]=1
+        A[C==0]=0
+        return(A)
+    }
+    T=g$theta
+    S=g$sigma
+    U=T
+    cnames=colnames(T)
+    for (i in 1:ncol(T)) {
+        #idx=which(S[i,]^2 > add | T[i,] > 0)
+        idx=which(T[i,] > 0)
+        if (length(idx)>1) {
+            L=lms(g$data[,c(i,idx)])
+            for(j in 1:length(idx)) {
+                #if (!is.null(add)) {
+                #    if (L[1,j+1]>add & U[i,idx[j]]==0) {
+                #       U[i,idx[j]]= 1
+                #    }
+                #}
+                if (L[1,j+1]<del) {
+                    U[i,idx[j]]= 0
+                }
+            }
+        }   
+    }
+    U=fixGraph(U)   
+    return(U)
+}
+

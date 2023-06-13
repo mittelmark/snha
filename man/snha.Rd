@@ -15,7 +15,8 @@
   prob=FALSE, 
   prob.threshold=0.2, 
   prob.n=25, 
-  nd=FALSE) 
+  nd=FALSE, 
+  lmc=FALSE) 
 } 
 \arguments{ 
 \item{data}{a data frame where network nodes are the row names and data 
@@ -36,6 +37,7 @@
          the edge must be found in 50\% of all samplings, default: 0.2} 
 \item{prob.n}{number of bootstrap samples to be taken, default: 25} 
 \item{nd}{perfom network deconvolution due to the method of Feizi et. al. 2013, default: FALSE} 
+\item{lmc}{perfom a linear model check, edges whch does not improve the node model by adjacent edges more than 0.2 are removed, default: FALSE} 
 } 
 \keyword{network} 
 \keyword{correlation} 
