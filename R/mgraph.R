@@ -450,13 +450,21 @@ mgraph_u2d <- function (g,input=2,negative=0.0,shuffle=FALSE) {
 #'    quality of a predicted graph in comparison to a known true one.
 #'    The graph comparisons are done on the basis of undirected graphs only.
 #'    Directed graphs are converted to undirected internally.
+#' 
+#'    The most used accuracy measure to balance the different measures is the F-score where:
+#' 
+#' \itemize{
+#'    \item the F0.5 measure (beta=0.5) gives more weight on precision, less weight on sensitivity/recall.
+#'    \item the F1 measure (beta=1.0) balances the weight on precision and sensitivity/recall.
+#'    \item the F2 measure (beta=2.0) gives less weight on precision, more weight on sensitivity/recall
+#'   }
 #' }
 #' \usage{mgraph_accuracy(g.true,g.pred)}
 #' \arguments{
 #' \item{g.true}{snha, mgraph or or adjacency matrix of a the true graph}
 #' \item{g.pred}{snha, mgraph or or adjacency matrix of a the predicted graph}
 #' }
-#' \value{returns list object with various accuracy measures, such as Sens(itivity), Spec(ificity), Acc(uracy), balanced classification rate (BCR), F1 measure and Mathhews correlaition coefficient (MCC)}
+#' \value{returns list object with various accuracy measures, such as Sens(itivity), Spec(ificity), Prec(ision), Acc(uracy), Non-information-rate (NIR), balanced classification rate (BCR), F1 measure and Mathhews correlation coefficient (MCC)}
 #' \examples{
 #' ang=mgraph(type="angie",nodes=12,edges=18)
 #' data=snha_graph2data(ang)
@@ -472,6 +480,9 @@ mgraph_u2d <- function (g,input=2,negative=0.0,shuffle=FALSE) {
 
 mgraph_accuracy <- function (g.true,g.pred) {
     # Convert to undirected
+    fbeta = function (prec,sens,beta=1) {
+        return(((1+beta^2)*prec*sens)/(beta^2*prec+sens))
+    }
     if (!is.vector(g.true)) {
         g.true <- mgraph_d2u(g.true)
         g.pred <- mgraph_d2u(g.pred)
@@ -484,14 +495,24 @@ mgraph_accuracy <- function (g.true,g.pred) {
     TN=as.double(length(which(g.true == 0 & g.pred == 0)))
     FN=as.double(length(which(g.true != 0 & g.pred == 0)))
     # Included NA check
-    Acc=if ( (TP+TN+FP+FN) != 0 ) { TP+TN/(TP+TN+FP+FN) } else { NaN }
-    Sens=if ( (TP+FN) != 0 ) { TP/(TP+FN) } else { NaN }
-    Spec=if ( (TN+FP) != 0 ) { TN/(TN+FP) } else { NaN }
-    BCR=(Sens+Spec)/2
-    F1=if ( (2*TP+FP+FN) != 0 ) { 2*TP/(2*TP+FP+FN) } else { NaN }
+    Acc  = if ( (TP+TN+FP+FN) != 0 ) { (TP+TN)/(TP+TN+FP+FN) } else { NaN }
+    Sens = if ( (TP+FN) != 0 ) { TP / (TP+FN) } else { NaN }
+    Spec = if ( (TN+FP) != 0 ) { TN / (TN+FP) } else { NaN }
+    BCR  =  (Sens+Spec)/2
+    Prec = if ( (TP+FP) != 0 ) { TP / (TP+FP) } else { NaN }
+    NIR  = max(prop.table(table(g.true)))
+    pt   = stats::prop.test(sum(diag(table(g.true,g.pred))),length(g.true),p=NIR,alternative="greater")
+    Acc.conf.int=I=pt$conf.int
+    Acc.p.value=pt$p.value
+    F1= fbeta(Prec,Sens,beta=1.0)
+    F2= fbeta(Prec,Sens,beta=2.0)
+    F0.5= fbeta(Prec,Sens,beta=0.5)
     MCC=if ( sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)) != 0) { (TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)) } else { NaN }
     norm_MCC=(MCC+1)/2
-    return(list(TP=TP,FP=FP,TN=TN,FN=FN,Sens=Sens,Spec=Spec, BCR=BCR,F1=F1,MCC=MCC, norm_MCC=norm_MCC))
+    return(list(TP=TP,FP=FP,TN=TN,FN=FN,Sens=Sens,Spec=Spec, Prec=Prec,
+                BCR=BCR,F1=F1,F2=F2,F0.5=F0.5,
+                MCC=MCC, norm_MCC=norm_MCC, 
+                Acc=Acc, NIR=NIR, Acc.p.value=pt$p.value))
 }
 
 #' \name{mgraph_nd}
@@ -583,7 +604,7 @@ mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
 #'    change the default values for del and add. 
 #'    The function snha uses defaults of 0.02 for del(eting) and 0.05 for add(ing) values.
 #' }
-#' \usage{mgraph_lmc(x,del=0.02,add=NULL)}
+#' \usage{mgraph_lmc(x,del=0.02)}
 #' \arguments{
 #' \item{x}{snha graph object}
 #' \item{del}{r-square threshold to delete edges, edges not adding more than this value to the linear model to the target node will be deleted, default: 0.02}
@@ -612,39 +633,15 @@ mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
 
 mgraph_lmc <- function (x,del=0.02) {
     g=x
-    lms <- function (x) {
-        L=matrix(0,nrow=ncol(x),ncol=ncol(x))
-        rownames(L)=colnames(L)=colnames(x)
-        cnames=colnames(x)
-        for (i in 1:ncol(x)) {
-            cn=setdiff(cnames,cnames[i])
-            while (length(cn)>1) {
-                frm=stats::formula(paste(cnames[i],"~",paste(cn,collapse="+")))
-                adjrs.all=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
-                min=1
-                min.cn=cn[1]
-                for (c in cn) {
-                    frm=stats::formula(paste(cnames[i],"~",paste(setdiff(cn,c),collapse="+")))
-                    adjrs.cn=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
-                    if (adjrs.all-adjrs.cn<min) {
-                        min=adjrs.all-adjrs.cn
-                        min.cn=c
-                    }   
-                }    
-                cn=setdiff(cn,min.cn)
-                L[cnames[i],min.cn]=min
-            }
-            frm=stats::formula(paste(cnames[i],"~",cn[1]))
-            L[cnames[i],cn[1]]=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
-        }
-        L[L<0]=0
-        return(L)
-    }
     fixGraph <- function (A) {
-        C=A
-        A[upper.tri(A)]=A[upper.tri(A)]+t(A[lower.tri(A)])
-        A[A>1]=1
-        A[C==0]=0
+        for (i in 1:(ncol(A)-1)) {
+            for (j in i:ncol(A)) {
+                if (A[i,j]<del & A[j,i] < del) {
+                    A[i,j]=A[j,i]=0
+                }
+            }
+        }
+        A[A>0]=1
         return(A)
     }
     T=g$theta
@@ -655,20 +652,128 @@ mgraph_lmc <- function (x,del=0.02) {
         #idx=which(S[i,]^2 > add | T[i,] > 0)
         idx=which(T[i,] > 0)
         if (length(idx)>1) {
-            L=lms(g$data[,c(i,idx)])
+            L=mgraph_lms(g$data[,c(i,idx)])
             for(j in 1:length(idx)) {
                 #if (!is.null(add)) {
                 #    if (L[1,j+1]>add & U[i,idx[j]]==0) {
                 #       U[i,idx[j]]= 1
                 #    }
                 #}
-                if (L[1,j+1]<del) {
-                    U[i,idx[j]]= 0
-                }
+                U[i,idx[j]]= L[1,j+1]
             }
-        }   
+        } else if (length(idx) == 1) {
+            U[i,idx]=g$sigma[i,idx]
+        }
     }
-    U=fixGraph(U)   
+    X=U
+    X[T>0 & X==0] = 0.001
+    U=fixGraph(X)
     return(U)
 }
 
+#' \name{mgraph_lms}
+#' \alias{mgraph_lms}
+#' \title{linear model backward variable selection}
+#' \description{
+#'    This function is a simple version of linear model building using backward
+#'    variable selection. At each step the variable with the lowest decrease value
+#'    in the adjusted R-square value is removed from the model and the r-square value is stored in the return matrix.
+#' }
+#' \usage{mgraph_lms(x)}
+#' \arguments{
+#' \item{x}{a data matrix or data frame}
+#' }
+#' \value{returns matrix with the adjusted r-square values attributed by the variables}
+#' \examples{
+#' data(swiss)
+#' round(mgraph_lms(swiss)*100,2)
+#' W = mgraph(type='werner')
+#' data=t(snha_graph2data(W))
+#' round(mgraph_lms(data)*100,2)
+#' }
+#' 
+
+mgraph_lms <- function (x) {
+    L=matrix(0,nrow=ncol(x),ncol=ncol(x))
+    rownames(L)=colnames(L)=colnames(x)
+    cnames=colnames(x)
+    for (i in 1:ncol(x)) {
+        cn=setdiff(cnames,cnames[i])
+        while (length(cn)>1) {
+            frm=stats::formula(paste(cnames[i],"~",paste(cn,collapse="+")))
+            adjrs.all=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
+            min=1
+            min.cn=cn[1]
+            for (c in cn) {
+                frm=stats::formula(paste(cnames[i],"~",paste(setdiff(cn,c),collapse="+")))
+                adjrs.cn=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
+                if (adjrs.all-adjrs.cn<min) {
+                    min=adjrs.all-adjrs.cn
+                    min.cn=c
+                }   
+            }    
+            cn=setdiff(cn,min.cn)
+            L[cnames[i],min.cn]=min
+        }
+        frm=stats::formula(paste(cnames[i],"~",cn[1]))
+        L[cnames[i],cn[1]]=summary(lm(frm,data=as.data.frame(x)))$adj.r.squared
+    }
+    L[L<0]=0
+    return(L)
+}
+
+
+#' \name{mgraph_trf}
+#' \alias{mgraph_trf}
+#' \title{checking possible chains with 3 nodes for triad structures}
+#' \description{
+#'    This function checks a given snha graph for possible triad structures
+#'    which were not recognized by the original algorithm.
+#'    The method checks all nodes within path length 2 for a possible edge
+#'    by comparing the ratio of the correlation coefficients.
+#'    The function snha uses defaults of 0.02 for del(eting) and 0.05 for add(ing) values.
+#' }
+#' \usage{mgraph_trf(x,frac=1.2)}
+#' \arguments{
+#' \item{x}{snha graph object}
+#' \item{frac}{amount which the absolute correlation exceeds in compariuson of the product of the other two correlations in the possible triad, value should be larger than 1, default: 1.2}
+#' }
+#' \value{returns snha graph object with added triads to chains and to the adjacency matrix}
+#' \examples{
+#' set.seed(124)
+#' W=mgraph(type="werner")
+#' data=t(snha_graph2data(W))
+#' aa=snha(data)
+#' aa$theta
+#' unlist(mgraph_accuracy(W,aa$theta))
+#' # remove false positive by linear model
+#' ab=mgraph_lmc(aa)
+#' aa$theta=ab
+#' aa=mgraph_trf(aa)
+#' unlist(mgraph_accuracy(W,aa$theta))
+#' }
+#' 
+
+mgraph_trf <- function (x,frac=1.2) {
+    C=abs(x$sigma)
+    sp=Snha_shortest_paths(x$theta)
+    cn=colnames(sp)
+    for (i in 1:nrow(sp)) {
+        p2=which(sp[i,]==2) 
+        for (p in p2) {
+            sns=intersect(which(sp[p,]==1),which(sp[i,]==1))
+            if (length(sns)>0) {
+                for (s in sns) {
+                    f=C[i,p]/(C[i,s]*C[p,s])
+                    if (C[i,p]>0.1 & x$p.values[i,p]<0.1 & f > frac) {
+                        x$theta[i,p]=1
+                        x$theta[p,i]=1
+                        key=paste('t-chain',cn[i],cn[p],cn[s],sep="-")
+                        x$chains[[key]]=paste(cn[i],cn[p],cn[s],sep="-")
+                    }
+                }
+            }
+        }
+    }
+    return(x)
+}

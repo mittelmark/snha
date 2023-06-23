@@ -201,7 +201,7 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
     as=ReduceChains(as)
     class(as)='snha'
     if (lmc) {
-        as$theta=mgraph_lmc(as)
+        as$theta=mgraph_lmc(as,del=0.01)
     }
     return(as)
 }
