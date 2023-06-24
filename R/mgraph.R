@@ -604,15 +604,16 @@ mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
 #'    change the default values for del and add. 
 #'    The function snha uses defaults of 0.02 for del(eting) and 0.05 for add(ing) values.
 #' }
-#' \usage{mgraph_lmc(x,del=0.02)}
+#' \usage{mgraph_lmc(x,del=0.02,add=NULL)}
 #' \arguments{
-#' \item{x}{snha graph object}
-#' \item{del}{r-square threshold to delete edges, edges not adding more than this value to the linear model to the target node will be deleted, default: 0.02}
+#'     \item{x}{snha graph object}
+#'     \item{del}{r-square threshold to delete edges, edges not adding more than this value to the linear model to the target node will be deleted, default: 0.02}
+#'     \item{add}{r-square threshold to add edges, if NULL no edges will be added, recommended value is 0.05, default: NULL}
 #' }
 #' \value{returns adjacency matrix where edges migh be removed if they are not adding explanation to the model}
 #' \examples{
 #' set.seed(123)
-#' B=mgraph(type="barabasi",m=1)
+#' B=mgraph(type="barabasi",m=2,nodes=6)
 #' data=t(snha_graph2data(B))
 #' aa=snha(data)
 #' aa$theta
@@ -621,17 +622,16 @@ mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
 #' unlist(mgraph_accuracy(B,ab))
 #' ab
 #' aa$theta-ab
-#' unlist(mgraph_accuracy(B,aa$theta))
-#' unlist(mgraph_accuracy(B,ab))
+#' ac=mgraph_lmc(aa,add=0.02)
+#' unlist(mgraph_accuracy(B,ac))
 #' }
 #' 
 
 # linear model check for a snha graph object
+# adding or deleting edges if linear model suggests it
+#  TODO: rank based approach in case method of snha is spearman
 
-
-# \item{add}{r-square threshold to add edges, if NULL no edges will be added, recommended value is 0.05, default: NULL}
-
-mgraph_lmc <- function (x,del=0.02) {
+mgraph_lmc <- function (x,del=0.02,add=NULL) {
     g=x
     fixGraph <- function (A) {
         for (i in 1:(ncol(A)-1)) {
@@ -648,17 +648,33 @@ mgraph_lmc <- function (x,del=0.02) {
     S=g$sigma
     U=T
     cnames=colnames(T)
+    # addition
+    if (!is.null(add)) {
+        for (i in 1:ncol(T)) {
+            idx = which(T[i,] > 0 | abs(S[i,]) > 0.1)
+            idx = setdiff(idx,i)
+            if (length(idx)>1) {
+                L=mgraph_lms(g$data[,c(i,idx)])
+                # it is slower due to measure more linear models
+                # than in deletion mode
+                for(j in 1:length(idx)) {
+                    if (L[1,j+1] > add & T[i,idx[j]] == 0) {
+                        U[i,idx[j]] = L[1,j+1]
+                    }
+                }
+            }
+        }
+        U[U>0]=1
+        U[upper.tri(U)]=mapply(max,U[upper.tri(U)],t(U)[upper.tri(U)])
+        U[lower.tri(U)]=t(U)[lower.tri(U)]
+        T=U
+    }
     for (i in 1:ncol(T)) {
         #idx=which(S[i,]^2 > add | T[i,] > 0)
         idx=which(T[i,] > 0)
         if (length(idx)>1) {
             L=mgraph_lms(g$data[,c(i,idx)])
             for(j in 1:length(idx)) {
-                #if (!is.null(add)) {
-                #    if (L[1,j+1]>add & U[i,idx[j]]==0) {
-                #       U[i,idx[j]]= 1
-                #    }
-                #}
                 U[i,idx[j]]= L[1,j+1]
             }
         } else if (length(idx) == 1) {
@@ -670,6 +686,7 @@ mgraph_lmc <- function (x,del=0.02) {
     U=fixGraph(X)
     return(U)
 }
+
 
 #' \name{mgraph_lms}
 #' \alias{mgraph_lms}
@@ -727,6 +744,8 @@ mgraph_lms <- function (x) {
 #' \alias{mgraph_trf}
 #' \title{checking possible chains with 3 nodes for triad structures}
 #' \description{
+#'    Experimental:
+#' 
 #'    This function checks a given snha graph for possible triad structures
 #'    which were not recognized by the original algorithm.
 #'    The method checks all nodes within path length 2 for a possible edge

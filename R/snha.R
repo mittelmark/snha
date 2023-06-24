@@ -82,7 +82,8 @@
 #'   prob.threshold=0.2,
 #'   prob.n=25,
 #'   nd=FALSE,
-#'   lmc=FALSE)
+#'   lmc=FALSE,
+#'   lma=FALSE)
 #' }
 #' \arguments{
 #' \item{data}{a data frame where network nodes are the row names and data
@@ -103,7 +104,8 @@
 #'          the edge must be found in 50\% of all samplings, default: 0.2}
 #' \item{prob.n}{number of bootstrap samples to be taken, default: 25}
 #' \item{nd}{perfom network deconvolution due to the method of Feizi et. al. 2013, default: FALSE}
-#' \item{lmc}{perfom a linear model check, edges whch does not improve the node model by adjacent edges more than 0.2 are removed, default: FALSE}
+#' \item{lmc}{perfom a linear model check, edges which does not improve the node model by adjacent edges more than 0.02 are removed, default: FALSE}
+#' \item{lma}{perfom a linear model check, edges which does improve the node model by adjacent edges with more than 0.02 R-square are added, works only if lmc is TRUE,default: FALSE}
 #' }
 #' \keyword{network}
 #' \keyword{correlation}
@@ -135,7 +137,7 @@
 snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
                      check.singles=FALSE,
                      prob=FALSE,prob.threshold=0.2,prob.n=25,
-                     nd=FALSE,lmc=FALSE) {
+                     nd=FALSE,lmc=FALSE,lma=FALSE) {
     if (prob) {
         # check for correlation matrix
         if (nrow(data)==ncol(data) &  
@@ -201,7 +203,11 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
     as=ReduceChains(as)
     class(as)='snha'
     if (lmc) {
-        as$theta=mgraph_lmc(as,del=0.01)
+        if (lma) {
+            as$theta=mgraph_lmc(as,del=0.01,add=0.02)
+        } else {
+            as$theta=mgraph_lmc(as,del=0.01,add=NULL)
+        }
     }
     return(as)
 }
