@@ -23,7 +23,7 @@
 #' \item{mode}{either 'undirected' or 'directed', default: 'directed'}
 #' \item{nodes}{number of nodes for a given type, default: 10}
 #' \item{edges}{number of edges for a given type, not used for type "barabasi", default: 12}
-#' \item{m}{number of edges added in each iteration of type is 'barabasi', default: 1}
+#' \item{m}{number of edges added in each iteration of type is 'barabasi', can be values such as 1,2 or fractionla numbers such as 1.3 which means 70 percent single chain addition and 30 percent  double chain additions, default: 1}
 #' \item{k}{the degree for a regular graph, or the number of clusters for a cluster graph or the number of hubs for a hubs graph, default: 2}
 #' \item{p}{the probabilty for edges if type is 'gnp',default=NULL}
 #' \item{power}{the power for preferential attachment if type is 'barabasi', 
@@ -52,6 +52,8 @@
 #' W
 #' B=mgraph(type='barabasi')
 #' B
+#' D=mgraph(type='barabasi',m=1.3)
+#' D
 #' }
 #' \seealso{ \link[snha:snha]{snha}, \link[snha:plot.snha]{plot.snha}}
 #' 
@@ -91,10 +93,17 @@ mgraph <- function (x=NULL,type="random",mode="directed",nodes=10,edges=12,m=1,k
         } else if (type == "barabasi") {
             x[2, 1]=1
             for (n in 3:ncol(x)) {
-                if (m==n) {
+                if (floor(m)==n) {
                     sel=n-1
                 } else {
-                    sel=m
+                    if (floor(m)==m) {
+                        sel=m
+                    } else {
+                        low=floor(m)
+                        high=ceiling(m)
+                        probs=c((high-m),(m-low))
+                        sel=sample(c(low,high),1,prob=probs)
+                    }
                 }
                 deg=mgraph_degree(x)^power
                 # preferential attachment to nodes with higher degree

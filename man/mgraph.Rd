@@ -23,7 +23,7 @@
 \item{mode}{either 'undirected' or 'directed', default: 'directed'} 
 \item{nodes}{number of nodes for a given type, default: 10} 
 \item{edges}{number of edges for a given type, not used for type "barabasi", default: 12} 
-\item{m}{number of edges added in each iteration of type is 'barabasi', default: 1} 
+\item{m}{number of edges added in each iteration of type is 'barabasi', can be values such as 1,2 or fractionla numbers such as 1.3 which means 70 percent single chain addition and 30 percent  double chain additions, default: 1} 
 \item{k}{the degree for a regular graph, or the number of clusters for a cluster graph or the number of hubs for a hubs graph, default: 2} 
 \item{p}{the probabilty for edges if type is 'gnp',default=NULL} 
 \item{power}{the power for preferential attachment if type is 'barabasi',  
@@ -52,6 +52,8 @@ W=mgraph(type='werner')
 W 
 B=mgraph(type='barabasi') 
 B 
+D=mgraph(type='barabasi',m=1.3) 
+D 
 } 
 \seealso{ \link[snha:snha]{snha}, \link[snha:plot.snha]{plot.snha}} 
  
