@@ -71,6 +71,8 @@
 #'     The main entry function to initialize a snha object with data where
 #'     variables are in columns and items are in rows. If you like to use the network
 #'     deconvolution method of Feizi et al. instead of the data submit the deconvoluted matrix.
+#'     As methods either correlation methods such as pearson, spearman or kendall or mutual information (mi) can be used.
+#'    The latter method as  well  covers non-linear linear relationships.
 #' }
 #' \usage{snha(
 #'   data,
@@ -91,7 +93,7 @@
 #' \item{alpha}{confidence threshold for p-value edge cutting after all chains
 #'              were generated, default: 0.05.}
 #' \item{method}{method to calculate correlation/association values, can be
-#'               'pearson', 'spearman' or 'kendall', default: 'pearson'.}
+#'               'pearson', 'spearman' or 'kendall', 'mi', default: 'pearson'.}
 #' \item{threshold}{R-squared correlation coefficient threshold for which
 #'           r-square values should be used for chain generation, r=0.1 is r-square of
 #'           0.01, default: 0.01.}
@@ -129,6 +131,11 @@
 #' sw.g=snha(swiss,method='spearman',check.singles=TRUE,prob=TRUE)
 #' sw.g$theta
 #' sw.g$probabilities
+#' sw.m=snha(swiss,method="mi")
+#' sw.m$theta
+#' par(mfrow=c(1,2))
+#' plot(sw.g)
+#' plot(sw.m)
 #' }
 #' \seealso{ \link[snha:plot.snha]{plot.snha}}
 #' 
@@ -177,6 +184,9 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
         vprob=as.vector(as$probabilities)
         as$p.values[]=unlist(lapply(vprob,function (x) 1-length(which(x>rand.prob))/length(rand.prob)))
     } else {
+        if (method == "mi") {
+            data=snha_mi(data,gnorm=TRUE)
+        }
         as=Asgp$data2chainGraph(data,alpha=alpha,method=method,threshold=threshold,nd=nd)
         if (check.singles) {
             cmt=as$sigma
@@ -201,6 +211,7 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
         as$probabilities=as$theta
     }
     as=ReduceChains(as)
+    as$method=method
     class(as)='snha'
     if (lmc) {
         if (lma) {
@@ -1097,3 +1108,85 @@ snha_corrplot = function (x,
         }
     }
 }
+
+#' \name{snha_mi}
+#' \alias{snha_mi}
+#' \title{mutual information for two vectors or a matrix}
+#' \usage{snha_mi(x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE)}
+#' \description{This function computes the mutual information between two numerical variables
+#'  or for all pairs of variables if a matrix is given. The normalization is actual value divided by the the geometric mean: I'(X,Y) = I(X,Y)/sqrt(I(X)*I(Y)) 
+#' }
+#' \arguments{
+#' \item{x}{either a binned table, a matrix or data.frame or a numerical vector}
+#' \item{y}{numerical vector, required if x is a vector, otherwise ignored,default:NULL}
+#' \item{breaks}{number of breaks to create a binned table, default: 4}
+#' \item{coc}{Coefficient of constrains, Cxy=Ixy/Hy and Cyx=Ixy/Hx, this measure is asymetric,default:FALSE}
+#' \item{gnorm}{mutual information should be normalized by using the geometric mean Ixy=Ixy/sqrt(Ix*Iy),default:FALSE}
+#' }
+#' \value{mutual information value as scalar if input is table or two vectors or as matrix if input is matrix or data.frame}
+#' \examples{
+#' rn1=rnorm(100,mean=10,sd=1);
+#' rn2=rn1+0.5*rnorm(100)
+#' cor(rn1,rn2) # high
+#' cor(rn1,sample(rn2)) #random 
+#' snha_mi(rn1,rn2) # high 
+#' snha_mi(rn1,sample(rn2)) #random
+#' snha_mi(rn1,rn2,breaks=4)
+#' snha_mi(rn1,rn2,breaks=7)
+#' data(swiss)
+#' round(snha_mi(swiss),2)
+#' round(snha_mi(swiss,gnorm=TRUE),2)
+#' as=snha(snha_mi(swiss,gnorm=TRUE))
+#' plot(as)
+#' }
+
+snha_mi = function (x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE) {
+    if (is.matrix(x) | is.data.frame(x)) {
+        if (ncol(x)==2) {
+            return(snha_mi(x=x[,1],y=x[,2],breaks=breaks,norm=norm))
+        } else {
+            M=matrix(0,nrow=ncol(x),ncol=ncol(x))
+            rownames(M)=colnames(M)=colnames(x)
+            for (i in 1:(ncol(x)-1)) {
+                for (j in i:ncol(x)) {
+                    M[i,j]=M[j,i]=snha_mi(x[,i],x[,j],breaks=breaks)
+                }   
+            }
+            # last cell
+            M[ncol(x),ncol(x)]=snha_mi(x[,ncol(x)],x[,ncol(x)])
+            if (coc & gnorm) {
+                stop("Only one of gnorm or coc can be TRUE")
+            }
+            if (gnorm | coc) {
+                for (i in 1:(ncol(x)-1)) {
+                    for (j in (i+1):ncol(x)) {
+                        if (coc) {
+                            M[i,j]=M[i,j]/M[j,j]
+                            M[j,i]=M[j,i]/M[i,i]
+                        } else {
+                            M[i,j]=M[j,i]=M[i,j]/sqrt(M[i,i]*M[j,j])
+                        }
+                    }
+                }
+                diag(M)=1
+            }
+            return(M)
+        }
+    }
+    if (!is.table(x)) {
+        if (class(y)[1] != "NULL") {
+            x=table(cut(x,breaks=breaks),cut(y,breaks=breaks))        
+        } else {
+            stop("if x is vector, y must be given as well")
+        }
+    }
+    f1=x/sum(x)
+    fx=rowSums(f1)
+    fy=colSums(f1)
+    fn=fx %o% fy
+    f2=fn/sum(fn)
+    LR = ifelse(f1>0,log(f1/f2),0)
+    MI = sum(f1*LR)
+    return(MI)
+}
+
