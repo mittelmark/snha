@@ -613,11 +613,12 @@ mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
 #'    change the default values for del and add. 
 #'    The function snha uses defaults of 0.02 for del(eting) and 0.05 for add(ing) values.
 #' }
-#' \usage{mgraph_lmc(x,del=0.02,add=NULL)}
+#' \usage{mgraph_lmc(x,del=0.02,add=NULL,method='pearson')}
 #' \arguments{
 #'     \item{x}{snha graph object}
 #'     \item{del}{r-square threshold to delete edges, edges not adding more than this value to the linear model to the target node will be deleted, default: 0.02}
 #'     \item{add}{r-square threshold to add edges, if NULL no edges will be added, recommended value is 0.05, default: NULL}
+#'     \item{method}{The method which was used to generate a graph, if spearman or mutual information were given data are rank transformed, default: 'pearson'}
 #' }
 #' \value{returns adjacency matrix where edges migh be removed if they are not adding explanation to the model}
 #' \examples{
@@ -640,8 +641,13 @@ mgraph_nd = function (x,beta=0.99,alpha=1,control=FALSE) {
 # adding or deleting edges if linear model suggests it
 #  TODO: rank based approach in case method of snha is spearman
 
-mgraph_lmc <- function (x,del=0.02,add=NULL) {
+mgraph_lmc <- function (x,del=0.02,add=NULL,method="pearson") {
     g=x
+    if (method == "pearson") {
+        data=g$data
+    } else {
+        data=apply(data,2,rank)
+    }
     fixGraph <- function (A) {
         for (i in 1:(ncol(A)-1)) {
             for (j in i:ncol(A)) {
@@ -663,7 +669,7 @@ mgraph_lmc <- function (x,del=0.02,add=NULL) {
             idx = which(T[i,] > 0 | abs(S[i,]) > 0.1)
             idx = setdiff(idx,i)
             if (length(idx)>1) {
-                L=mgraph_lms(g$data[,c(i,idx)])
+                L=mgraph_lms(data[,c(i,idx)])
                 # it is slower due to measure more linear models
                 # than in deletion mode
                 for(j in 1:length(idx)) {
@@ -682,7 +688,7 @@ mgraph_lmc <- function (x,del=0.02,add=NULL) {
         #idx=which(S[i,]^2 > add | T[i,] > 0)
         idx=which(T[i,] > 0)
         if (length(idx)>1) {
-            L=mgraph_lms(g$data[,c(i,idx)])
+            L=mgraph_lms(data[,c(i,idx)])
             for(j in 1:length(idx)) {
                 U[i,idx[j]]= L[1,j+1]
             }

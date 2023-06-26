@@ -215,9 +215,9 @@ snha <- function (data,alpha=0.05,method='pearson',threshold=0.01,
     class(as)='snha'
     if (lmc) {
         if (lma) {
-            as$theta=mgraph_lmc(as,del=0.01,add=0.02)
+            as$theta=mgraph_lmc(as,del=0.01,add=0.02,method=method)
         } else {
-            as$theta=mgraph_lmc(as,del=0.01,add=NULL)
+            as$theta=mgraph_lmc(as,del=0.01,add=NULL,method=method)
         }
     }
     return(as)
