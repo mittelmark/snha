@@ -5,6 +5,8 @@
     The main entry function to initialize a snha object with data where 
     variables are in columns and items are in rows. If you like to use the network 
     deconvolution method of Feizi et al. instead of the data submit the deconvoluted matrix. 
+    As methods either correlation methods such as pearson, spearman or kendall or mutual information (mi) can be used. 
+   The latter method as  well  covers non-linear linear relationships. 
 } 
 \usage{snha( 
   data, 
@@ -25,7 +27,7 @@
 \item{alpha}{confidence threshold for p-value edge cutting after all chains 
              were generated, default: 0.05.} 
 \item{method}{method to calculate correlation/association values, can be 
-              'pearson', 'spearman' or 'kendall', default: 'pearson'.} 
+              'pearson', 'spearman' or 'kendall', 'mi', default: 'pearson'.} 
 \item{threshold}{R-squared correlation coefficient threshold for which 
           r-square values should be used for chain generation, r=0.1 is r-square of 
           0.01, default: 0.01.} 
@@ -63,6 +65,11 @@ round(sw.g$sigma,2)
 sw.g=snha(swiss,method='spearman',check.singles=TRUE,prob=TRUE) 
 sw.g$theta 
 sw.g$probabilities 
+sw.m=snha(swiss,method="mi") 
+sw.m$theta 
+par(mfrow=c(1,2)) 
+plot(sw.g) 
+plot(sw.m) 
 } 
 \seealso{ \link[snha:plot.snha]{plot.snha}} 
  
