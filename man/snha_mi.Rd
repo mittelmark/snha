@@ -1,7 +1,7 @@
 \name{snha_mi} 
 \alias{snha_mi} 
 \title{mutual information for two vectors or a matrix} 
-\usage{snha_mi(x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE)} 
+\usage{snha_mi(x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE,norm=FALSE)} 
 \description{This function computes the mutual information between two numerical variables 
  or for all pairs of variables if a matrix is given. The normalization is actual value divided by the the geometric mean: I'(X,Y) = I(X,Y)/sqrt(I(X)*I(Y))  
 } 
@@ -11,6 +11,7 @@
 \item{breaks}{number of breaks to create a binned table, default: 4} 
 \item{coc}{Coefficient of constrains, Cxy=Ixy/Hy and Cyx=Ixy/Hx, this measure is asymetric,default:FALSE} 
 \item{gnorm}{mutual information should be normalized by using the geometric mean Ixy=Ixy/sqrt(Ix*Iy),default:FALSE} 
+\item{norm}{divide every MI value by the MI value for the variable, this measure is as well asymetric,default:FALSE} 
 } 
 \value{mutual information value as scalar if input is table or two vectors or as matrix if input is matrix or data.frame} 
 \examples{ 

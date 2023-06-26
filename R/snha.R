@@ -1112,7 +1112,7 @@ snha_corrplot = function (x,
 #' \name{snha_mi}
 #' \alias{snha_mi}
 #' \title{mutual information for two vectors or a matrix}
-#' \usage{snha_mi(x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE)}
+#' \usage{snha_mi(x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE,norm=FALSE)}
 #' \description{This function computes the mutual information between two numerical variables
 #'  or for all pairs of variables if a matrix is given. The normalization is actual value divided by the the geometric mean: I'(X,Y) = I(X,Y)/sqrt(I(X)*I(Y)) 
 #' }
@@ -1122,6 +1122,7 @@ snha_corrplot = function (x,
 #' \item{breaks}{number of breaks to create a binned table, default: 4}
 #' \item{coc}{Coefficient of constrains, Cxy=Ixy/Hy and Cyx=Ixy/Hx, this measure is asymetric,default:FALSE}
 #' \item{gnorm}{mutual information should be normalized by using the geometric mean Ixy=Ixy/sqrt(Ix*Iy),default:FALSE}
+#' \item{norm}{divide every MI value by the MI value for the variable, this measure is as well asymetric,default:FALSE}
 #' }
 #' \value{mutual information value as scalar if input is table or two vectors or as matrix if input is matrix or data.frame}
 #' \examples{
@@ -1140,7 +1141,7 @@ snha_corrplot = function (x,
 #' plot(as)
 #' }
 
-snha_mi = function (x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE) {
+snha_mi = function (x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE,norm=FALSE) {
     if (is.matrix(x) | is.data.frame(x)) {
         if (ncol(x)==2) {
             return(snha_mi(x=x[,1],y=x[,2],breaks=breaks,norm=norm))
@@ -1154,8 +1155,8 @@ snha_mi = function (x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE) {
             }
             # last cell
             M[ncol(x),ncol(x)]=snha_mi(x[,ncol(x)],x[,ncol(x)])
-            if (coc & gnorm) {
-                stop("Only one of gnorm or coc can be TRUE")
+            if (length(which(coc,gnorm,norm))>1) {
+                stop("Only one of coc, gnorm or coc can be TRUE")
             }
             if (gnorm | coc) {
                 for (i in 1:(ncol(x)-1)) {
@@ -1169,6 +1170,8 @@ snha_mi = function (x,y=NULL,breaks=4,coc=FALSE,gnorm=FALSE) {
                     }
                 }
                 diag(M)=1
+            } else if (norm) {
+                M=M/diag(M)
             }
             return(M)
         }
