@@ -105,8 +105,8 @@ License: MIT License see the file [LICENSE](LICENSE) for details.
 
 The following persons have contributed to the package with ideas, testing, etc.:
 
-* Michael Hermanussen (Aschauhof, the algorithm is his ideas)
-* Masiar Novine (University of Potsdam, evaluating different daa generation methods and comparing the algorithm)
+* Michael Hermanussen (Aschauhof, the algorithm idea)
+* Masiar Novine (University of Potsdam, evaluating different data generation methods and comparing the algorithm swit other approaches)
 * Tim Hake (University of Potsdam, Python port and critical discussions about directed edges)
 * Bernhard Bodenberger (University of Potsdam, evaluating the bootstrap performances and different parts of the algorithm)
 * Cedric Moris (University of Potsdam, evaluating different extensions of the basic algorithm)
