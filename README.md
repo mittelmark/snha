@@ -101,6 +101,16 @@ Author: Detlef Groth, University of Potsdam, Germany
 
 License: MIT License see the file [LICENSE](LICENSE) for details.
 
+## Contributors
+
+The following persons have contributed to the package with ideas, testing, etc.:
+
+* Michael Hermanussen (Aschauhof, the algorithm is his ideas)
+* Masiar Novine (University of Potsdam, evaluating different daa generation methods and comparing the algorithm)
+* Tim Hake (University of Potsdam, Python port and critical discussions about directed edges)
+* Bernhard Bodenberger (University of Potsdam, evaluating the bootstrap performances and different parts of the algorithm)
+* Cedric Moris (University of Potsdam, evaluating different extensions of the basic algorithm)
+
 ## Bug reporting
 
 In case of bugs and suggestions, use the [issues](https://github.com/mittelmark/snha/issues) link on top.
