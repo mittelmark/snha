@@ -15,10 +15,11 @@ jobs:
       run: |
         sudo apt-get install texlive-base
         make install-ubuntu 
-         
-#    - name: Upload Artifact GitHub Action
-#      uses: actions/upload-artifact@v3
-#      with: 
-#        name: snha*tar.gz
-#        path: build/
+        mkdir build
+        cp snha_0.2.0.tar.gz build/
+    - name: Upload Artifact GitHub Action
+      uses: actions/upload-artifact@v3
+      with: 
+         name: snha_0.2.0.tar.gz
+         path: build/snha_0.2.0.tar.gz
 
