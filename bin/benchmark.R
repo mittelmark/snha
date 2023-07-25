@@ -92,8 +92,10 @@ benchmark <-  function (iter=3) {
         acc=mgraph_accuracy(graph,pred$theta)
         return(list(Sens=acc$Sens,Spec=acc$Spec,Prec=acc$Prec,MCC=acc$MCC,Time=tdiff))
     }
-    bench <-  function (graph) {
-        g.data = t(snha_graph2data(graph,iter=200,prop=0.02))
+    bench <-  function (graph,g.data=NULL) {
+        if (!is.matrix(g.data)) {
+            g.data = t(snha_graph2data(graph,iter=200,prop=0.02))
+        }
         res=performance(graph,g.data,snha)
         data=data.frame(method="1def",t(unlist(res)))
         res=performance(graph,g.data,snha,lmc=TRUE)
@@ -138,8 +140,10 @@ benchmark <-  function (iter=3) {
     }
     W=mgraph(type="werner")
     B0=mgraph(type="band",nodes=10)    
-    B1=mgraph(type="barabasi",m=1)
-    B2=mgraph(type="barabasi",m=2)
+    B10=mgraph(type="barabasi",m=1)
+    B13=mgraph(type="barabasi",m=1.3)
+    B20=mgraph(type="barabasi",m=2)
+
     for (i in 1:iter) {
         cat("starting iter",i,"\n")
         acc=bench(W)
@@ -150,11 +154,16 @@ benchmark <-  function (iter=3) {
             df=rbind(df,res)
         }
         acc=bench(B0)
-        df=rbind(df,data.frame(gtype=rep("B0",nrow(acc)),acc))
-        acc=bench(B1)
-        df=rbind(df,data.frame(gtype=rep("B1",nrow(acc)),acc))
-        acc=bench(B2)
-        df=rbind(df,data.frame(gtype=rep("B2",nrow(acc)),acc))
+        df=rbind(df,data.frame(gtype=rep("B00",nrow(acc)),acc))
+        acc=bench(B10)
+        df=rbind(df,data.frame(gtype=rep("B10",nrow(acc)),acc))
+        acc=bench(B13)
+        df=rbind(df,data.frame(gtype=rep("B13",nrow(acc)),acc))
+        acc=bench(B20)
+        df=rbind(df,data.frame(gtype=rep("B20",nrow(acc)),acc))
+        SF=huge.generator(graph="scale-free",d=20)
+        acc=bench(SF$theta,g.data=SF$data)
+        df=rbind(df,data.frame(gtype=rep("SF",nrow(acc)),acc))
         cat("ending iter",i,"\n")
     }
     return(df)
