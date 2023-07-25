@@ -11,3 +11,6 @@ man/%.Rd: R/%.R
 
 install: check
 	R CMD INSTALL $(PKG)_$(VERSION).tar.gz
+
+install-ubuntu: 
+	echo "install.packages(c('knitr','rmarkdown');" | Rscript -e -
