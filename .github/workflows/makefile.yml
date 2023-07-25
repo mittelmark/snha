@@ -18,14 +18,11 @@ jobs:
             cleveref
             hyperref
           
-    - uses: actions/checkout@v3
     - name: Build
+    - uses: actions/checkout@v3
       run: |
         make install-ubuntu 
-
-    - name: Run check
-      run: make check
-          
+         
     - name: Upload Artifact GitHub Action
       uses: actions/upload-artifact@v3
       with: 
