@@ -13,6 +13,7 @@ install: check
 	R CMD INSTALL $(PKG)_$(VERSION).tar.gz
 
 install-ubuntu: 
+	echo "Starting build!"
 	sudo apt-get install texlive-base
 	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org',lib=getwd());" | Rscript -
 	export R_LIBS=. && R CMD build --no-build-vignettes .
