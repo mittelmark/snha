@@ -1,4 +1,6 @@
 ^\.git$
+^\.github$
+^build$
 ^rlibs$
 ^bin$
 ^img$
