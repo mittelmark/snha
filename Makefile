@@ -15,7 +15,8 @@ install: check
 install-ubuntu: 
 	echo "Starting build!"
 	sudo apt-get install texlive-base
-	sudo apt-get install texlive-pdftex
+	sudo apt-get install texlive-recommended
+	sudo apt-get install texlive-pictures
 	sudo apt-get install pandoc
 	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org',lib=getwd());" | Rscript -
 	export R_LIBS=. && R CMD build --no-build-vignettes .
