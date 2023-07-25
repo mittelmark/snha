@@ -14,8 +14,8 @@ install: check
 
 install-ubuntu: 
 	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org',lib=getwd());" | Rscript -
-	export RLIBS=. && R CMD build --no-build-vignettes .
-	export RLIBS=. && R CMD check --no-build-vignettes $(PKG)_$(VERSION).tar.gz
+	export R_LIBS=. && R CMD build --no-build-vignettes .
+	export R_LIBS=. && R CMD check --no-build-vignettes $(PKG)_$(VERSION).tar.gz
 	-mkdir build
 	cp $(PKG)_$(VERSION).tar.gz build/$(PKG)_$(VERSION).tar.gz
 	
