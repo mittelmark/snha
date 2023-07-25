@@ -19,6 +19,7 @@ install-ubuntu:
 	sudo apt-get install texlive-latex-extra
 	sudo apt-get install texlive-pictures
 	sudo apt-get install pandoc
+	mkdir rlibs
 	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org',lib=file.path(getwd(),'rlibs'));" | Rscript -
 	export R_LIBS=./rlibs && R CMD build --no-build-vignettes .
 	export R_LIBS=./rlibs && R CMD check --no-build-vignettes $(PKG)_$(VERSION).tar.gz
