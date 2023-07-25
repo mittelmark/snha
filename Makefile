@@ -13,4 +13,4 @@ install: check
 	R CMD INSTALL $(PKG)_$(VERSION).tar.gz
 
 install-ubuntu: 
-	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org');" | Rscript -
+	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org',lib=getwd());" | Rscript -
