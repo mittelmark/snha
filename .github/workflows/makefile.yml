@@ -16,9 +16,9 @@ jobs:
         sudo apt-get install texlive-base
         make install-ubuntu 
          
-    - name: Upload Artifact GitHub Action
-      uses: actions/upload-artifact@v3
-      with: 
-        name: snha*tar.gz
-        path: build/
+#    - name: Upload Artifact GitHub Action
+#      uses: actions/upload-artifact@v3
+#      with: 
+#        name: snha*tar.gz
+#        path: build/
 
