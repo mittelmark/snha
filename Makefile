@@ -13,7 +13,7 @@ install: check
 	R CMD INSTALL $(PKG)_$(VERSION).tar.gz
 
 install-ubuntu: 
-	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org',lib=getwd());tinytex::install_tinytex();" | Rscript -
+	echo "install.packages(c('knitr','rmarkdown'),repos='http://cran.us.r-project.org',lib=getwd());" | Rscript -
 	echo "install.packages('https://github.com/rstudio/tinytex/archive/refs/tags/v0.45.tar.gz',repos=NULL)" | Rscript -
 	export R_LIBS=. && R CMD build --no-build-vignettes .
 	export R_LIBS=. && R CMD check --no-build-vignettes $(PKG)_$(VERSION).tar.gz
