@@ -14,8 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: make build
+      run: make install-ubuntu build 
 
     - name: Run check
-      run: make check build check
+      run: make check
 
