@@ -1,4 +1,4 @@
-# Snha package
+# Snha package ![](https://cranlogs.r-pkg.org/badges/snha)
 
 R package which implements the St. Nicolas House Algorithm (SNHA) for
 constructing networks of correlated variables using a ranking of the pairwise
