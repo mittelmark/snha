@@ -3,6 +3,7 @@ Type: Package
 Title: Creating Correlation Networks using St. Nicolas House Analysis
 Version: 0.2.0
 Date: 2023-05-13
+Author: Detlef Groth
 Authors@R: c(person("Detlef","Groth", role=c("aut", "cre"),
                      email = "dgroth@uni-potsdam.de",
                     comment=c(ORCID="0000-0002-9441-3978")))
