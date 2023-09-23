@@ -20,7 +20,8 @@ For an implementation of the algorithm in Python look here
 ## Statistics
 
 * Downloads - total: ![](https://cranlogs.r-pkg.org/badges/grand-total/snha)
-* Downloads - weekly: ![](https://cranlogs.r-pkg.org/badges/grand-total/snha)
+* Downloads - monthly: ![](https://cranlogs.r-pkg.org/badges/snha)
+* Downloads - weekly: ![](https://cranlogs.r-pkg.org/badges/last-week/snha)
 
 ## Installation
 
