@@ -19,7 +19,7 @@
 \arguments{ 
 \item{x}{either a adjacency matrix or an adjacency list, if given type is not used} 
 \item{type}{graph type, one of 'angie', 'band', 'barabasi', 'circle', 'cluster', 
-      'hubs', 'random', 'regular' or 'werner', default: 'random'} 
+      'hubs', 'nicolas','random', 'regular' or 'werner', default: 'random'} 
 \item{mode}{either 'undirected' or 'directed', default: 'directed'} 
 \item{nodes}{number of nodes for a given type, default: 10} 
 \item{edges}{number of edges for a given type, not used for type "barabasi", default: 12} 
@@ -32,7 +32,7 @@
 } 
 \keyword{network} 
 \keyword{graph} 
-\value{mgraph object, which contains an adjacency matrix} 
+\value{mgraph object, which contains an adjacency matrix and optional an attribute for a layout} 
 \examples{ 
 M <- matrix(0,nrow=7,ncol=7) 
 rownames(M)=colnames(M)=LETTERS[1:7] 
@@ -54,6 +54,9 @@ B=mgraph(type='barabasi')
 B 
 D=mgraph(type='barabasi',m=1.3) 
 D 
+N=mgraph(type='nicolas') 
+## Nicolas graph brings its own layout 
+plot(N,layout=attr(N,'layout')) 
 } 
 \seealso{ \link[snha:snha]{snha}, \link[snha:plot.snha]{plot.snha}} 
  
