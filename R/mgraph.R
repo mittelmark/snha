@@ -19,7 +19,7 @@
 #' \arguments{
 #' \item{x}{either a adjacency matrix or an adjacency list, if given type is not used}
 #' \item{type}{graph type, one of 'angie', 'band', 'barabasi', 'circle', 'cluster',
-#'       'hubs', 'random', 'regular' or 'werner', default: 'random'}
+#'       'hubs', 'nicolas','random', 'regular' or 'werner', default: 'random'}
 #' \item{mode}{either 'undirected' or 'directed', default: 'directed'}
 #' \item{nodes}{number of nodes for a given type, default: 10}
 #' \item{edges}{number of edges for a given type, not used for type "barabasi", default: 12}
@@ -32,7 +32,7 @@
 #' }
 #' \keyword{network}
 #' \keyword{graph}
-#' \value{mgraph object, which contains an adjacency matrix}
+#' \value{mgraph object, which contains an adjacency matrix and optional an attribute for a layout}
 #' \examples{
 #' M <- matrix(0,nrow=7,ncol=7)
 #' rownames(M)=colnames(M)=LETTERS[1:7]
@@ -54,11 +54,14 @@
 #' B
 #' D=mgraph(type='barabasi',m=1.3)
 #' D
+#' N=mgraph(type='nicolas')
+#' ## Nicolas graph brings its own layout
+#' plot(N,layout=attr(N,'layout'))
 #' }
 #' \seealso{ \link[snha:snha]{snha}, \link[snha:plot.snha]{plot.snha}}
 #' 
 mgraph <- function (x=NULL,type="random",mode="directed",nodes=10,edges=12,m=1,k=3,p=NULL,power=1) {
-    types=c("angie","band","barabasi","circle","cluster","gnp","hubs","random","regular","werner")
+    types=c("angie","band","barabasi","circle","cluster","gnp","hubs","nicolas","random","regular","werner")
     i=pmatch(type,types)
     if (is.na(i)) {
         stop(paste("Unkown type: Known types are: '",paste(types,collapse="', '"),"'!",sep=""))
@@ -139,6 +142,20 @@ mgraph <- function (x=NULL,type="random",mode="directed",nodes=10,edges=12,m=1,k
             x[3,4]=1
             x[4,5:6]=1
             x[5,6]=1
+        } else  if (type == "nicolas") {
+            mt=matrix(0,nrow=5,ncol=5)
+            rownames(mt)=colnames(mt)=LETTERS[1:5]
+            mt['A',c('B','E')]=1
+            mt['B',c('C','E')]=1
+            mt['C','D']=1
+            mt['D',c('A','B')]=1
+            mt['E','D']=1
+            lay=matrix(c(0,0, 0,1, 0.5,1.75, 1,1, 1,0),
+                       ncol=2,byrow=TRUE)
+            rownames(lay)=rownames(mt)
+            colnames(lay)=c("x","y")
+            attr(mt,'layout')=lay
+            x=mt
         } else if (type %in% c("cluster","hubs")) {
             size = nodes %/% k
             rem  = nodes %%  k

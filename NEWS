@@ -6,3 +6,7 @@ Version 0.2.0 - 2023-06-01
   to evaluate performance  
 - added snha_mi as method for snha
 - added script bin/benchmark.R to perform some benchmarks
+
+Version 0.2.1 - 2024-07-06
+
+- adding nicolas graph as sample graph

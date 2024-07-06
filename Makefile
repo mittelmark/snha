@@ -1,4 +1,4 @@
-VERSION := 0.2.0
+VERSION := $(shell grep -E '^Version:' DESCRIPTION | sed 's/Version: //')
 PKG     := $(shell basename `pwd`)
 build: man/snha.Rd man/mgraph.Rd
 	R CMD build .
