@@ -42,7 +42,7 @@ For installing the latest stable version directly from Github you can execute th
 
 ```
 install.packages(
-  "https://github.com/mittelmark/tmdoc4r/releases/download/v0.2.1/snha_0.2.1.tar.gz",
+  "https://github.com/mittelmark/snha/releases/download/v0.2.1/snha_0.2.1.tar.gz",
   repos=NULL);
 ``` 
 
