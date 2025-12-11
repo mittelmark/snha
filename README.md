@@ -31,38 +31,28 @@ Either install the package directly from CRAN as usually:
 install.packages('snha')
 ```
 
-Or to use the latest version from the Github repository install it like this:
+For installing the latest stable version directly from Github you can execute the following command in your R console:
+
+```
+install.packages(
+  "https://github.com/mittelmark/tmdoc4r/releases/download/v0.2.1/snha_0.2.1.tar.gz",
+  repos=NULL);
+``` 
+
+Thereafter you can load the package and the vignette of the package like this:
+
+```
+library(snha)
+vignette("tutorial",package="snha)
+citation("snha")
+```
+
+Or to use the latest development version from the Github repository install it like this:
 
 ```
 library(remotes)
 remotes::install_github("https://github.com/mittelmark/snha")
 ```
-
-Thereafter you can check the installation like this:
-
-```
-library(snha)
-citation("snha")
-```
-
-Which should display something like this:
-
-```
-> citation("snha")
-To cite package 'snha' in publications use:
-
-> citation("snha")
-
-To cite package ‘snha’ in publications use:
-
-  Detlef Groth, University of Potsdam (2023). snha: St.
-  Nicolas House Algorithm for R. R package version 0.1.3
-
-...
-```
-
-As there are currently no differences between the CRAN and the Github repository
-the CRAN install is the recommended way.
 
 ## Example
 
