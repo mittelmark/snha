@@ -2,7 +2,8 @@
 [![Release](https://img.shields.io/github/v/release/mittelmark/snha.svg?label=current+release)](https://github.com/mittelmark/snha/releases)
 ![Downloads](https://img.shields.io/github/downloads/mittelmark/snha/total)
 ![Commits](https://img.shields.io/github/commits-since/mittelmark/snha/latest)
-[![Vignette](https://img.shields.io/badge/Vignette-blue)](https://github.com/mittelmark/tmdoc4r/releases/latest/download/tutorial.html)
+[![Vignette&nbsp;PDF](https://img.shields.io/badge/Vignette-blue)](https://github.com/mittelmark/snha/releases/latest/download/snha-tutorial.pdf)
+[![Vignette&nbsp;HTML](https://img.shields.io/badge/Vignette-blue)](https://github.com/mittelmark/snha/releases/latest/download/tutorial.html)
 
 # Snha package
 

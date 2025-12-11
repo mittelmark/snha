@@ -5,6 +5,8 @@ build: man/snha.Rd man/mgraph.Rd
 
 check: build
 	R CMD check $(PKG)_$(VERSION).tar.gz
+	echo "@page { size: 12in 9in; }  body { font-size: 80% ; }" > small.css
+	weasyprint snha.Rcheck/snha/doc/tutorial.html -s small.css snha-tutorial.pdf
 	### --no-build-vignette
 
 
