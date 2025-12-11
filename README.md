@@ -1,3 +1,9 @@
+[![license](https://img.shields.io/badge/licenseMIT-lightgray.svg)](https://opensource.org/license/bsd)
+[![Release](https://img.shields.io/github/v/release/mittelmark/snha.svg?label=current+release)](https://github.com/mittelmark/snha/releases)
+![Downloads](https://img.shields.io/github/downloads/mittelmark/snha/total)
+![Commits](https://img.shields.io/github/commits-since/mittelmark/snha/latest)
+[![Vignette](https://img.shields.io/badge/Vignette-blue)](https://github.com/mittelmark/tmdoc4r/releases/latest/download/tutorial.html)
+
 # Snha package
 
 R package which implements the St. Nicolas House Algorithm (SNHA) for
@@ -17,7 +23,7 @@ correlation values. The package contains the R code for the papers:
 For an implementation of the algorithm in Python look here
 [https://github.com/thake93/snha4py](https://github.com/thake93/snha4py).
 
-## Statistics
+## CRAN Statistics
 
 * Downloads - total: ![](https://cranlogs.r-pkg.org/badges/grand-total/snha)
 * Downloads - monthly: ![](https://cranlogs.r-pkg.org/badges/snha)
