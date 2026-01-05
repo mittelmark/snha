@@ -416,7 +416,7 @@ mgraph_nodeColors <- function (g,col=c("skyblue","grey80","salmon"),type="inout"
         colors[out == 0 & inc >  0] = col[1]    
         return(colors)
     } else if (type == "harmonic") {
-        cols=c("#eeeeee","#eebbbb","#ee9999","#ee7777","#ee5555","#ee3333")
+        cols=c("#ccffff","#ccdddd","#cccccc","#eecccc","#ee8888","#ee3333")
         h = mgraph_harmonic_centrality(g)
         c=cut(h,breaks=c(0,0.01,0.2,0.4,0.6,0.8,1),include.lowest=TRUE)
         if (legend) {

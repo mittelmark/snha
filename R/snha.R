@@ -645,7 +645,7 @@ plot.snha = function (x,type='network',
             xrange=range(xy[,1])
             yrange=range(xy[,2])
             xlim=c(xrange[1]-1/10*diff(xrange),xrange[2]+1/10*diff(xrange))
-            ylim=c(yrange[1]-1/10*diff(yrange),yrange[2]+1/10*diff(yrange))
+            ylim=c(yrange[1]-1/8*diff(yrange),yrange[2]+1/10*diff(yrange)) ## modest more space at the bottom for legend
             if (class(probabilities)[1] == "NULL") {
                 probabilities=theta
             }

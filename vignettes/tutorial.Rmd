@@ -320,9 +320,13 @@ B = mgraph(type="barabasi",nodes=20,edges=3)
 mgraph_harmonic_centrality(B)
 cols=mgraph_nodeColors(B,type="harmonic")
 lg =mgraph_nodeColors(B,type="harmonic",legend=TRUE)
-plot(B,layout="sam",vertex.color=cols)
+sizes = 4 + 6 * mgraph_harmonic_centrality(B)
+plot(B,layout="sam",vertex.color=cols,vertex.size=sizes)
 legend("bottom",fill=lg$col, legend=lg$legend,ncol=6)
 ```
+
+For more information on harmomic  centrality have a look at this blog entry by
+by [symbio6.nl](https://symbio6.nl/en/blog/analysis/harmonic-centrality).
 
 ## Creating your own data
 
