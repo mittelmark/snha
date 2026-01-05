@@ -15,6 +15,11 @@
 \item{g}{a mgraph object} 
 \item{norm}{should the harmonic centrality normalized over the number of nodes, default: TRUE} 
 #  } 
+\references{ 
+\itemize{ 
+\item Marchiori, M., & Latora, V. (2000). Harmony in the small-world. Physica A: Statistical Mechanics and its Applications, 285(3-4), 539-546. 
+} 
+} 
 \examples{ 
  A=mgraph(type="regular",nodes=8,k=3) 
  plot(A,layout="sam") 
@@ -24,5 +29,9 @@
  plot(B,layout="sam") 
  mgraph_degree(B) 
  mgraph_harmonic_centrality(B) 
+ cols=mgraph_nodeColors(B,type="harmonic") 
+ plot(B,layout="sam",vertex.color=cols) 
+ lg=mgraph_nodeColors(B,type="harmonic",legend=TRUE) 
+ legend("bottom",fill=lg$col, legend=lg$legend,ncol=5) 
 } 
  

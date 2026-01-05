@@ -334,6 +334,11 @@ mgraph_d2u <- function (g) {
 #' \item{g}{a mgraph object}
 #' \item{norm}{should the harmonic centrality normalized over the number of nodes, default: TRUE}
 #  }
+#' \references{
+#' \itemize{
+#' \item Marchiori, M., & Latora, V. (2000). Harmony in the small-world. Physica A: Statistical Mechanics and its Applications, 285(3-4), 539-546.
+#' }
+#' }
 #' \examples{
 #'  A=mgraph(type="regular",nodes=8,k=3)
 #'  plot(A,layout="sam")
@@ -343,12 +348,15 @@ mgraph_d2u <- function (g) {
 #'  plot(B,layout="sam")
 #'  mgraph_degree(B)
 #'  mgraph_harmonic_centrality(B)
+#'  cols=mgraph_nodeColors(B,type="harmonic")
+#'  plot(B,layout="sam",vertex.color=cols)
+#'  lg=mgraph_nodeColors(B,type="harmonic",legend=TRUE)
+#'  legend("bottom",fill=lg$col, legend=lg$legend,ncol=5)
 #' }
 #' 
 
 mgraph_harmonic_centrality <- function (g,norm=TRUE) {
-    g=mgraph_d2u(g)
-    sp=mgraph$shortest.paths(g)
+    sp=Snha_shortest_paths(g,mode="undirected")
     diag(sp)=Inf
     if (norm) {
         res=apply(sp,1,function (x) { (sum(1/x))/(length(x)-1) })
@@ -369,11 +377,15 @@ mgraph_harmonic_centrality <- function (g,norm=TRUE) {
 #'   on their incoming and outcoming edges.
 #' }
 #' \usage{mgraph_nodeColors(g,
-#'     col=c("skyblue","grey80","salmon")
+#'     col=c("skyblue","grey80","salmon"),
+#'     type="inout",
+#'     legend=FALSE
 #' )}
 #' \arguments{
 #' \item{g}{a mgraph object or an adjacency matrix or an adjacency list}
 #' \item{col}{default colors for nodes with only incoming, in- and outgoing and only outgoing edges, default: c("skyblue","grey80","salmon")}
+#' \item{type}{type of color selection, either "inout" or "harmonic" (centrality), default: "inout"}
+#' \item{legend}{should be colors and legend labels returned instead of colors, default: FALSE}
 #  }
 #' \examples{
 #' par(mfrow=c(1,2),mai=rep(0.1,4))
@@ -383,17 +395,42 @@ mgraph_harmonic_centrality <- function (g,norm=TRUE) {
 #' mgraph_degree(A,mode="out")
 #' cols
 #' plot(A, layout="star")
-#' plot(A, layout="star",vertex.color=cols) 
+#' plot(A, layout="star",vertex.color=cols)
+#' cols=mgraph_nodeColors(A,type="harmonic")
+#' plot(A, layout="star",vertex.color=cols)
+#' lg=mgraph_nodeColors(A,type="harmonic",legend=TRUE)
+#' legend("bottom",fill=lg$col, legend=lg$legend)
 #' }
 #'
 
-mgraph_nodeColors <- function (g,col=c("skyblue","grey80","salmon")) {
-    colors = rep(col[2],nrow(g))
-    out    = mgraph_degree(g,mode="out")
-    inc     = mgraph_degree(g,mode="in")    
-    colors[out >  0 & inc == 0] = col[3]
-    colors[out == 0 & inc >  0] = col[1]    
-    return(colors)
+mgraph_nodeColors <- function (g,col=c("skyblue","grey80","salmon"),type="inout",legend=FALSE) {
+    if (type == "inout") {
+        if (legend) {
+            return(list(legend=c("out","inout","in"),
+                 col=col))
+        }
+        colors = rep(col[2],nrow(g))
+        out    = mgraph_degree(g,mode="out")
+        inc     = mgraph_degree(g,mode="in")    
+        colors[out >  0 & inc == 0] = col[3]
+        colors[out == 0 & inc >  0] = col[1]    
+        return(colors)
+    } else if (type == "harmonic") {
+        cols=c("#eeeeee","#eebbbb","#ee9999","#ee7777","#ee5555","#ee3333")
+        h = mgraph_harmonic_centrality(g)
+        c=cut(h,breaks=c(0,0.01,0.2,0.4,0.6,0.8,1),include.lowest=TRUE)
+        if (legend) {
+            return(list(legend=levels(c),
+                   col=cols))
+        }
+        lvls=as.character(c)
+        c=as.numeric(c)
+        cs = cols[c]
+        names(cs)=lvls
+        return(cs)
+    } else {
+        stop("Error: type must be either 'inout' or 'harmonic'!")
+    }
 }
 
 #' \name{mgraph_u2d}

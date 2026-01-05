@@ -2,7 +2,7 @@
 title: "Tutorial on the snha package"
 shorttitle: "snha package tutorial"
 author: Detlef Groth, University of Potsdam, Germany
-date: 2023-09-04
+date: 2026-01-06
 abstract: >
     The *snha* package provides easy to use R functions to apply the St.
     Nicolas House Analysis to your data. The algorithm traces associations chains between
@@ -294,6 +294,35 @@ run variation of the `snha` method. If you network is not too large it is
 usually recommended to use bootstrapping to get more insights into the edge
 quality and to get as well edges if the network is more dense and has a lot of
 highly connected nodes.
+
+## Node centralities
+
+For the  evaluation of the  importance of a node in a network often  centrality
+measures  like  degree,  closeness,  betweenness  or eigen  vector  centrality
+measures  are  used.  In  the  package  there  are  two  centrality   measures
+implemented,  the degree  centrality, the number of edges  connected to a node
+and the harmonic  centrality (Marchiori and Latora 2000 @Marchiori2000).  The latter is implemented as the  normalized  sum of the reciprocal
+shortest  path  lengths of a note to all other  nodes in the  network.  So the
+formula is as follows:
+
+![](equation.svg)
+
+Where  the  harmonic  mean  _h_ of a node  _u_ is  defined  as the  sum of the
+reciprocal of all shortest path  distances (d) divdied by N, the number of nodes,
+- 1.
+
+This  centrality  measure can be as well used to colorize more important, more
+central nodes differentially then others. Here an example:
+
+```{r fig=TRUE,fig.height=6,fig.width=10}
+par(mai=c(0.2,0.2,0.2,0.2))
+B = mgraph(type="barabasi",nodes=20,edges=3)
+mgraph_harmonic_centrality(B)
+cols=mgraph_nodeColors(B,type="harmonic")
+lg =mgraph_nodeColors(B,type="harmonic",legend=TRUE)
+plot(B,layout="sam",vertex.color=cols)
+legend("bottom",fill=lg$col, legend=lg$legend,ncol=6)
+```
 
 ## Creating your own data
 
