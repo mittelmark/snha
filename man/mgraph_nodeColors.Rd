@@ -1,5 +1,6 @@
 \name{mgraph_nodeColors} 
 \alias{mgraph_nodeColors} 
+\alias{mgraph_node_colors} 
 \title{create node colors for directed graphs} 
 \description{ 
   This function simplifies automatic color coding of nodes for directed graphs. 

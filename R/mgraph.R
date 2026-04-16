@@ -356,7 +356,7 @@ mgraph_d2u <- function (g) {
 #' 
 
 mgraph_harmonic_centrality <- function (g,norm=TRUE) {
-    sp=Snha_shortest_paths(g,mode="undirected")
+    sp=mgraph_shortest_paths(g,mode="undirected")
     diag(sp)=Inf
     if (norm) {
         res=apply(sp,1,function (x) { (sum(1/x))/(length(x)-1) })
@@ -370,6 +370,7 @@ mgraph_harmonic_centrality <- function (g,norm=TRUE) {
 
 #' \name{mgraph_nodeColors}
 #' \alias{mgraph_nodeColors}
+#' \alias{mgraph_node_colors}
 #' \title{create node colors for directed graphs}
 #' \description{
 #'   This function simplifies automatic color coding of nodes for directed graphs.
@@ -431,6 +432,66 @@ mgraph_nodeColors <- function (g,col=c("skyblue","grey80","salmon"),type="inout"
     } else {
         stop("Error: type must be either 'inout' or 'harmonic'!")
     }
+}
+mgraph_node_colors = mgraph_nodeColors
+
+#' \name{mgraph_shortest_paths}
+#' \alias{mgraph_shortest_paths}
+#' \title{caluclate shortest paths for a graph using BFS search}
+#' \description{
+#'   This function does a shortest path search for the given matrix using sime and slow BFS searrch.
+#' }
+#' \usage{mgraph_shortest_paths(g,mode="directed")}
+#' \arguments{
+#' \item{g}{a mgraph object or an adjacency matrix}
+#' \item{mode}{either 'directed' or 'undirected', default: 'directed'}
+#  }
+#' \examples{
+#' par(mfrow=c(1,2),mai=rep(0.1,4))
+#' A=mgraph(type="random",nodes=6,edges=8)
+#' mgraph_shortest_paths(A)
+#' }
+#'
+
+# simple shortest path  bfs search1
+mgraph_shortest_paths = function (g,mode="directed") {
+    A=g
+    if (class(A)[1] == "snha") {
+        A=A$theta
+    }
+    if (mode == "undirected") {
+        A=A+t(A)
+        A[A!=0]=1
+    }
+    S=A
+    S[]=Inf
+    diag(S)=0
+    x=1
+    S[A > 0 & A < Inf]=1
+    while (TRUE) { 
+        flag = FALSE 
+        for (m in 1:nrow(S)) {
+            ns=which(S[m,] == x)
+            for (n in ns) {
+                for (o in which(A[n,]==1)) {
+                    if (o != m) {
+                        flag = TRUE
+                        if (S[m,o] > x + 1) {
+                            S[m,o]=x+1
+                            if (mode == "undirected") {
+                                S[o,m]=x+1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (!flag) {
+            break
+        }
+        x=x+1
+    }
+    return(S)
 }
 
 #' \name{mgraph_u2d}
@@ -888,7 +949,7 @@ mgraph_lms <- function (x) {
 
 mgraph_trf <- function (x,frac=1.2) {
     C=abs(x$sigma)
-    sp=Snha_shortest_paths(x$theta)
+    sp=mgraph_shortest_paths(x$theta)
     cn=colnames(sp)
     for (i in 1:nrow(sp)) {
         p2=which(sp[i,]==2) 

@@ -2,7 +2,7 @@
 title: "Tutorial on the snha package"
 shorttitle: "snha package tutorial"
 author: Detlef Groth, University of Potsdam, Germany
-date: 2026-01-06
+date: 2026-04-16
 abstract: >
     The *snha* package provides easy to use R functions to apply the St.
     Nicolas House Analysis to your data. The algorithm traces associations chains between
@@ -109,8 +109,29 @@ as$theta
 It can be seen that the overall strength of the association is very small,
 largest r-square value is 0.18 for smoke, 0.13 for birthweight (bwt) but still
 the analysis show reasonable results without having the necessity of finding
-some optimal threshold.
+some optimal threshold. 
 
+
+We can as well extract the distances between all nodes, so their shortest path
+to other nodes using the *mgraph_shortest_paths* method like this:
+
+```{r label=spath,results='asis'}
+knitr::kable(mgraph_shortest_paths(as))
+```
+
+More important nodes have short distance to all other nodes. There are several
+centrality measures available for graphs. One example is the harmonic
+centrality which can be applied on a graph like this:
+
+```{r results='asis'}
+knitr::kable(data.frame(nodes=rownames(as$theta),
+hc=round(mgraph_harmonic_centrality(as),2)))
+```
+ 
+
+As you can see the nodes 'lwt' and 'bwt' have the highest centrality values, whereas the random data node 'rnd' has a centrality value of zero.
+
+We discuss this centrality topic this later in more detail.
 
 ## Decathlon data
 

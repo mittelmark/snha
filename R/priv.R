@@ -95,7 +95,7 @@ Components = function (A) {
     A=A+t(A)
     A[A>0]=1
     comp=c()
-    P=Snha_shortest_paths(A)
+    P=mgraph_shortest_paths(A)
     nodes=rownames(A)
     x=1
     while (length(nodes) > 0) {
@@ -117,7 +117,7 @@ ConnectComponents = function (A) {
     A=as.matrix(A)
     A=A+t(A)
     A[A>0]=1
-    P=Snha_shortest_paths(A)
+    P=mgraph_shortest_paths(A)
     if (!any(P==Inf)) {
         return(A)
     }
@@ -144,45 +144,6 @@ ConnectComponents = function (A) {
     return(A)
 }
 
-# simple shortest path  bfs search
-Snha_shortest_paths = function (A,mode="directed") {
-    if (class(A)[1] == "snha") {
-        A=A$theta
-    }
-    if (mode == "undirected") {
-        A=A+t(A)
-        A[A!=0]=1
-    }
-    S=A
-    S[]=Inf
-    diag(S)=0
-    x=1
-    S[A > 0 & A < Inf]=1
-    while (TRUE) { 
-        flag = FALSE 
-        for (m in 1:nrow(S)) {
-            ns=which(S[m,] == x)
-            for (n in ns) {
-                for (o in which(A[n,]==1)) {
-                    if (o != m) {
-                        flag = TRUE
-                        if (S[m,o] > x + 1) {
-                            S[m,o]=x+1
-                            if (mode == "undirected") {
-                                S[o,m]=x+1
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (!flag) {
-            break
-        }
-        x=x+1
-    }
-    return(S)
-}
 
 # creating a simple correlation plot for snha object
 

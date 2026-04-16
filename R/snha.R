@@ -879,7 +879,7 @@ snha_layout = function (A,mode='sam', method='pearson', noise=FALSE, star.center
     }
     if (mode %in% c('mds','sam')) {
         A=ConnectComponents(A)
-        sp=Snha_shortest_paths(A)
+        sp=mgraph_shortest_paths(A)
         xy=cmdscale(sp)
         rownames(xy)=rownames(A)
         if (mode=='mds') {
