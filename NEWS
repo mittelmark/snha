@@ -19,3 +19,8 @@ VERSION 0.4.0 - 2026-04-16
 
 - making function mgraph_shortest_path public
 - aliasing mgraph_nodeColors with mgraph_node_colors
+
+VERSION 0.5.0 - 2026-08-17
+
+- making function mgraph_components public
+

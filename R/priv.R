@@ -89,26 +89,6 @@ ReduceChains = function (g) {
 }
 
 
-## return the component ids for an adjacency matrix
-Components = function (A) {
-    A=as.matrix(A)
-    A=A+t(A)
-    A[A>0]=1
-    comp=c()
-    P=mgraph_shortest_paths(A)
-    nodes=rownames(A)
-    x=1
-    while (length(nodes) > 0) {
-        n=nodes[1]
-        idx=which(P[n,] < Inf)
-        ncomp=rep(x,length(idx))
-        names(ncomp)=rownames(P)[idx]
-        comp=c(comp,ncomp)
-        nodes=setdiff(nodes,rownames(P)[idx])
-        x=x+1
-    }
-    return(comp[rownames(A)])
-}
 
 # add edges to connect components of a graph
 # used for layout mechanism to not 
@@ -121,7 +101,7 @@ ConnectComponents = function (A) {
     if (!any(P==Inf)) {
         return(A)
     }
-    comp=Components(A)
+    comp=mgraph_components(A)
     nodes=c()
     tab=table(comp)
     for (n in names(tab)) {

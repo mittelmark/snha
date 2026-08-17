@@ -103,6 +103,52 @@ Asgp$chains2edgelists = function (chainlist) {
     }
     return(edgelists)
 }
+
+Asgp$partial_correlation = function (x,y,method="pearson") {
+    pcor = function (x,y,z,method="pearson") {
+        if (is.data.frame(z)) {
+            z=as.matrix(z)
+        }
+        if (is.matrix(z)) {
+            df=data.frame(x=x,y=y) 
+            for (col in 1:ncol(z)) {
+                df=cbind(df,z=z[,col])
+                colnames(df)[ncol(df)]=colnames(z)[col]
+            }
+        } else {
+            df=data.frame(x=x,y=y,z=z)
+        }
+        frmx=formula(paste("x~",paste(colnames(df)[3:ncol(df)],collapse="+"),sep=""))
+        frmy=formula(paste("y~",paste(colnames(df)[3:ncol(df)],collapse="+"),sep=""))
+        df=na.omit(df)
+        if (method=='spearman') {
+            df=as.data.frame(apply(df,2,rank))
+        }
+        xres=residuals(lm(frmx,data=df))
+        yres=residuals(lm(frmy,data=df))
+        
+        pr=cor(xres,yres)
+        gn=ncol(df)-2 # number of z
+        n=nrow(df)
+        statistic <- pr*sqrt((n-2-gn)/(1-pr^2))
+        p.value <- 2*pnorm(-abs(statistic))
+        return(list(estimate=pr,p.value=p.value))
+    }
+    R = matrix(1,ncol(x)-length(y),ncol(x)-length(y))
+    P = matrix(0,ncol(x)-length(y),ncol(x)-length(y))
+    '%ni%' = Negate('%in%')
+    cnames=colnames(x)[colnames(x) %ni% y]
+    rownames(R)=colnames(R)=cnames
+    rownames(P)=colnames(P)=cnames    
+    for (i in 1:(ncol(R)-1)) {
+        for (j in i:ncol(R)) {
+            r = pcor(x[,i],x[,j],x[,y],method=method)
+            R[i,j]=R[j,i]=r$estimate
+            P[i,j]=P[j,i]=r$p.value
+        }
+    }
+    return(list(R=R,P=P))
+}
 Asgp$data2chainGraph = function (data,method='pearson',
                                 square=TRUE,
                                 threshold=0.01,maxl=3,top=10,

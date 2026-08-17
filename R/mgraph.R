@@ -559,7 +559,7 @@ mgraph_u2d <- function (g,input=2,negative=0.0,shuffle=FALSE) {
         if (class(input)=='numeric') {
             nodes=c()
             
-            comps=Components(A)
+            comps=mgraph_components(A)
             if (max(comps)>1) {
                 for (i in 1:max(comps)) {
                     if (length(which(comps==i)) > 1) {
@@ -682,6 +682,51 @@ mgraph_accuracy <- function (g.true,g.pred) {
                 MCC=MCC, norm_MCC=norm_MCC, 
                 Acc=Acc, NIR=NIR, Acc.p.value=pt$p.value))
 }
+## return the component ids for an adjacency matrix
+#' \name{mgraph_components}
+#' \alias{mgraph_components}
+#' \title{extract graph components}
+#' \description{
+#'    The function `mgraph_components` extracts the components of a graph
+#'    which are the clusters of nodes which are not connected to each other.
+#' }
+#' \usage{mgraph_components(A)}
+#' \arguments{
+#' \item{A}{either an adjacency matrix of an undirected or direct graph, or an snha object}
+#' }
+#' \value{return a vector of component ids for each node}
+#' \examples{
+#' set.seed(123)
+#' A <- matrix(c(0,1,0, 1,0,0, 0,0,0), nrow=3, byrow=FALSE)  # replace with your adjacency
+#' mgraph_components(A)
+#' A = matrix(rbinom(100,1,p=0.1),ncol=10)
+#' A=A+t(A) ; A[A>1]=1
+#' mgraph_components(A)
+#' }
+#' 
+mgraph_components = function (A) {
+    if (class(A)[1] == "snha") {
+        A=A$theta
+    }
+    A=as.matrix(A)
+    A=A+t(A) # make undirected
+    A[A>0]=1
+    comp=c()
+    P=mgraph_shortest_paths(A)
+    nodes=rownames(A)
+    x=1
+    while (length(nodes) > 0) {
+        n=nodes[1]
+        idx=which(P[n,] < Inf)
+        ncomp=rep(x,length(idx))
+        names(ncomp)=rownames(P)[idx]
+        comp=c(comp,ncomp)
+        nodes=setdiff(nodes,rownames(P)[idx])
+        x=x+1
+    }
+    return(comp[rownames(A)])
+}
+
 
 #' \name{mgraph_nd}
 #' \alias{mgraph_nd}
