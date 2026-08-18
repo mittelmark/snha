@@ -727,6 +727,89 @@ mgraph_components = function (A) {
     return(comp[rownames(A)])
 }
 
+#' \name{mgraph_moranI}
+#' \alias{mgraph_moranI}
+#' \alias{mgraph_moranI}
+#' \title{Measure of global spatial autocorrelation adapted for networks}
+#' \description{
+#'   The function mgraph_moranI calculates the global Moran's I for the clustering of node
+#'   properties, positive values indicate a tendency of neighborhood
+#'   of nodes where they have similar property values, whereas negative values indicate a tendency of 
+#'   agglomeration of node with high values towards nodes with low vales.
+#'   values around zero indicate no association between the node values 
+#'   of neighbor nodes. 
+#' }
+#' \usage{mgraph_moranI(A, x,B=1000)}
+#' \arguments{
+#' \item{A}{adjacency matrix of an undirected graph}
+#' \item{x}{node values for the nodes of the adjacency matrix}
+#' \item{B}{number of boostrap samplings to determin the p-values for the Moran I value, default: 1000}
+#' }
+#' \value{List with following components:
+#'   \item{estimate}{gives the moran I value which should be between -1 and 1}
+#'   \item{p.value.greater}{proportion of boostrapped moran I values which where larger than the estimate value}
+#'   \item{p.value.less}{proportion of boostrapped moran I values which where smaller than the estimate value}
+#'   \item{p.value.two.sided}{two sided p-value calculated on the boostrapped p-values}
+#' }
+#' \references{
+#'   \itemize{
+#'     \item Moran, P. A. (1950). Notes on continuous stochastic phenomena. \emph{Biometrika, 37(1/2), 17-23}.
+#'   }
+#' }
+
+#' \examples{
+#' # create ring network with 8 nodes
+#' A = matrix(0,nrow=8,ncol=8)
+#' rownames(A)=colnames(A)=LETTERS[1:8]
+#' A['A','B']=1;A['B','C']=1;A['C','D']=1
+#' A['D','E']=1;A['E','F']=1; A['F','G']=1; 
+#' A['G','H']=1 ; A['A','H']=1; # ring
+#' A[lower.tri(A)]=t(A)[lower.tri(A)] # undirected
+#' values=c(1,2,3,4,4,3,2,1) # neighbor nodes have similar values
+#' unlist(mgraph_moranI(A,values))
+#' values=c(1,3,1,4,1,3,1,4) # neighbor nodes have very distinct values
+#' unlist(mgraph_moranI(A,values))
+#' values=sample(values) # just random pattern
+#' unlist(mgraph_moranI(A,values))
+#' }
+#' \seealso{\link[sbi:sbi-package]{sbi-package}}
+#' FILE: sbi/R/moranI.R
+
+mgraph_moranI <- function (A,x,B=1000) {
+    values=x
+    stopifnot(length(values) == nrow(A), length(values) == ncol(A))
+    x <- values - mean(values,na.rm=TRUE)
+    n <- nrow(A)
+    i = c()
+    j = c()
+    for (ii in 1:(nrow(A)-1)) {
+        for (jj in (ii+1):nrow(A)) {
+            if (A[ii,jj]>0) {
+                i=c(i,ii)
+                j=c(j,jj)
+            }
+        }
+    }
+    w=rep(1,length(i))
+
+    stopifnot(!any(is.na(i)), !any(is.na(j)))
+    S0 <- sum(w)
+    den <- sum(x^2)
+    num <- sum(w * (x[i] * x[j]))
+    I_obs <- (n / S0) * (num / den)
+    set.seed(1)
+    I_perm <- replicate(B, {
+                        
+      xp <- sample(values) - mean(values,na.rm=TRUE)  # keep same centering
+      nump <- sum(w * (xp[i] * xp[j]))
+      (n / S0) * (nump / sum(xp^2))
+  })
+    return(list(Moran_I = I_obs,
+                p.value.greater   = mean(I_perm >= I_obs),
+                p.value.less      = mean(I_perm <= I_obs),
+                p.value.two.sided = mean(abs(I_perm) >= abs(I_obs))))
+}
+
 
 #' \name{mgraph_nd}
 #' \alias{mgraph_nd}

@@ -23,4 +23,4 @@ VERSION 0.4.0 - 2026-04-16
 VERSION 0.5.0 - 2026-08-17
 
 - making function mgraph_components public
-
+- adding function mgraph_moranI
