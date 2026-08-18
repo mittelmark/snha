@@ -17,7 +17,8 @@
 \item{B}{number of boostrap samplings to determin the p-values for the Moran I value, default: 1000} 
 } 
 \value{List with following components: 
-  \item{estimate}{gives the moran I value which should be between -1 and 1} 
+  \item{estimate}{gives Moran's I value which should be between -1 and 1} 
+  \item{expected}{gives the expected Moran's I value under the assumption that H0 is true} 
   \item{p.value.greater}{proportion of boostrapped moran I values which where larger than the estimate value} 
   \item{p.value.less}{proportion of boostrapped moran I values which where smaller than the estimate value} 
   \item{p.value.two.sided}{two sided p-value calculated on the boostrapped p-values} 

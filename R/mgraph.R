@@ -746,7 +746,8 @@ mgraph_components = function (A) {
 #' \item{B}{number of boostrap samplings to determin the p-values for the Moran I value, default: 1000}
 #' }
 #' \value{List with following components:
-#'   \item{estimate}{gives the moran I value which should be between -1 and 1}
+#'   \item{estimate}{gives Moran's I value which should be between -1 and 1}
+#'   \item{expected}{gives the expected Moran's I value under the assumption that H0 is true}
 #'   \item{p.value.greater}{proportion of boostrapped moran I values which where larger than the estimate value}
 #'   \item{p.value.less}{proportion of boostrapped moran I values which where smaller than the estimate value}
 #'   \item{p.value.two.sided}{two sided p-value calculated on the boostrapped p-values}
@@ -804,10 +805,11 @@ mgraph_moranI <- function (A,x,B=1000) {
       nump <- sum(w * (xp[i] * xp[j]))
       (n / S0) * (nump / sum(xp^2))
   })
-    return(list(Moran_I = I_obs,
-                p.value.greater   = mean(I_perm >= I_obs),
-                p.value.less      = mean(I_perm <= I_obs),
-                p.value.two.sided = mean(abs(I_perm) >= abs(I_obs))))
+        return(list(Moran_I = I_obs,
+                    expected = -1/(nrow(A)-1),
+                    p.value.greater   = mean(I_perm >= I_obs),
+                    p.value.less      = mean(I_perm <= I_obs),
+                    p.value.two.sided = mean(abs(I_perm) >= abs(I_obs))))
 }
 
 

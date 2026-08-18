@@ -1,4 +1,20 @@
-Version 0.1.3 -  Initial Release
+VERSION 0.5.0 - 2026-08-18
+
+- making function mgraph_components public
+- adding function mgraph_moranI
+
+VERSION 0.4.0 - 2026-04-16
+
+- making function mgraph_shortest_path public
+- aliasing mgraph_nodeColors with mgraph_node_colors
+
+VERSION 0.3.0 - 2026-01-05
+
+- adding harmonic centrality
+
+Version 0.2.1 - 2025-12-11
+
+- adding nicolas graph as sample graph
 
 Version 0.2.0 - 2023-06-01
 
@@ -7,20 +23,7 @@ Version 0.2.0 - 2023-06-01
 - added snha_mi as method for snha
 - added script bin/benchmark.R to perform some benchmarks
 
-Version 0.2.1 - 2025-12-11
 
-- adding nicolas graph as sample graph
+Version 0.1.3 -  Initial Release
 
-VERSION 0.3.0 - 2026-01-05
 
-- adding harmonic centrality
-
-VERSION 0.4.0 - 2026-04-16
-
-- making function mgraph_shortest_path public
-- aliasing mgraph_nodeColors with mgraph_node_colors
-
-VERSION 0.5.0 - 2026-08-17
-
-- making function mgraph_components public
-- adding function mgraph_moranI
